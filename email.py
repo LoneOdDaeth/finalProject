@@ -1,0 +1,1 @@
+# bu sayfa oluşturulmuş olan şablonlara göre mail atma işlemini yapacağım dosya
