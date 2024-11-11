@@ -1,1 +1,0 @@
-# bu sayfa sql den gerekli verileri çekip o verileri grafiğe dökeceğim sayfa
