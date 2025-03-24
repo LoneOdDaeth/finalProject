@@ -5,8 +5,6 @@ from database.mongo_operations import *
 username = get_current_user()
 
 dummy_user = {
-    "name": "Selim Oğuz Şahin",
-    "email": "selim@example.com",
     "role": "Yönetici",
     "analyses": [
         {"id": 1, "name": "Analiz 1", "date": "2025-03-10"},
@@ -23,8 +21,7 @@ layout = html.Div([
     html.H2("Kullanıcı Profili", style={"text-align": "center", "color": "#00FF00"}),
     
     html.Div([
-        html.P(f"👤 Ad: {dummy_user['name']}", style={"font-size": "18px"}),
-        html.P(f"📧 E-posta: {dummy_user['email']}", style={"font-size": "18px"}),
+        html.P(f"👤 User: {username}", style={"font-size": "18px"}),
         html.P(f"🔰 Yetki: {dummy_user['role']}", style={"font-size": "18px", "font-weight": "bold"})
     ], style={"margin-bottom": "20px"}),
 

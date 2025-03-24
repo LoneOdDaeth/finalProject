@@ -3,7 +3,7 @@ import subprocess
 from tkinter import messagebox
 from database.mongo_operations import *
 from PIL import Image, ImageTk
-from utils.user_context import set_current_user
+from utils.user_context import *
 
 # Ortak tasarım özellikleri
 COLORS = {
@@ -48,8 +48,8 @@ def login():
     passData = getUserPass(username)
 
     if passData == password:
-        messagebox.showinfo("Giriş Başarılı", "Hoş geldiniz!")
         set_current_user(username)
+        messagebox.showinfo("Giriş Başarılı", "Hoş geldiniz!")
         switch_to_new_page()
     elif passData == 0:
         messagebox.showerror("HATA", "Kullanıcı ismi bulunamadı!")
@@ -57,6 +57,9 @@ def login():
         messagebox.showerror("HATA", "Parola hatalı girildi")
 
 def switch_to_new_page():
+
+    username1 = get_current_user()
+
     for widget in root.winfo_children():
         widget.destroy()
 
@@ -67,7 +70,7 @@ def switch_to_new_page():
     title_bar.pack(side="top", fill="x")
 
     title_label = tk.Label(
-        title_bar, text="Username", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]
+        title_bar, text=username1, bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]
     )
     title_label.pack(side="left", padx=10)
 

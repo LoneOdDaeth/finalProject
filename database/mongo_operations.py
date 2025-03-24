@@ -1,5 +1,6 @@
 from crypto.cryptoSaveMaterials import *
 from pymongo import MongoClient
+from datetime import datetime
 import os
 
 client = MongoClient("mongodb://localhost:27017/")
@@ -31,3 +32,14 @@ def getUserPass(username):
         return decrypted
     else:
         return 0  # Kullanıcı bulunamadı
+
+analyses_collection = db["analyses"]
+
+def save_analysis(username, filename, timestamp, analysis_data):
+    analysis_doc = {
+        "username": username,
+        "filename": filename,
+        "timestamp": timestamp,
+        "analysis": analysis_data
+    }
+    analyses_collection.insert_one(analysis_doc)
