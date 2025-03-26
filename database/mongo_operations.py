@@ -1,7 +1,6 @@
 from crypto.cryptoSaveMaterials import *
 from pymongo import MongoClient
-from datetime import datetime
-import os
+from bson import ObjectId
 
 client = MongoClient("mongodb://localhost:27017/")
 db = client["Erlik"]
@@ -43,3 +42,25 @@ def save_analysis(username, filename, timestamp, analysis_data):
         "analysis": analysis_data
     }
     analyses_collection.insert_one(analysis_doc)
+
+def get_user_analyses(username):
+    return list(db["analyses"].find({"username": username}).sort("timestamp", -1))
+
+def get_all_users():
+    return list(db["users"].find({}, {"_id": 1}))
+
+def get_analysis_by_filename(filename):
+    return db["analyses"].find_one({"filename": filename})
+
+def save_pdf_record(username, pdf_filename, timestamp, related_analysis, path):
+    db["pdf_reports"].insert_one({
+        "username": username,
+        "pdf_filename": pdf_filename,
+        "timestamp": timestamp,
+        "related_analysis": related_analysis,
+        "path": path
+    })
+
+def get_user_pdfs(username):
+    return list(db["pdf_reports"].find({"username": username}).sort("timestamp", -1))
+

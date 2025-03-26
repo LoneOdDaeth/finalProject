@@ -9,7 +9,8 @@ from database.mongo_operations import save_analysis
 from utils.user_context import *
 
 upload_path = "assets/uploads"
-tmp_path = "tmp"
+tmp_path = "tmp/json"
+os.makedirs(tmp_path, exist_ok=True)
 
 layout = html.Div([
     dbc.Row([
