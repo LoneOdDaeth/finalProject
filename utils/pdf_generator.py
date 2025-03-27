@@ -28,9 +28,12 @@ def save_plotly_figure(fig: go.Figure, filename: str):
     fig.write_image(path, format="png")
     return path
 
-def generate_pdf_from_figures(figures_dict: dict, meta_info: dict):
+def generate_pdf_from_figures(figures_dict: dict, meta_info: dict, username: str):
+    user_pdf_dir = os.path.join(pdf_dir, username)
+    os.makedirs(user_pdf_dir, exist_ok=True)
+
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    pdf_path = os.path.join(pdf_dir, f"analysis_report_{timestamp}.pdf")
+    pdf_path = os.path.join(user_pdf_dir, f"analysis_report_{timestamp}.pdf")
 
     c = canvas.Canvas(pdf_path, pagesize=A4)
     width, height = A4

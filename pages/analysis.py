@@ -1,19 +1,20 @@
-from dash import html, dcc, callback, Output, Input
+from dash import html, dcc, callback, Output, Input, State
 import os
 import json
 import datetime
 import plotly.express as px
-import urllib.parse as urlparse
-from urllib.parse import parse_qs
-from database.mongo_operations import get_analysis_by_filename  # bu fonksiyonu eklemelisin
-
-tmp_dir = "tmp/json"
+from utils.user_context import get_current_user
+from database.mongo_operations import get_user_analyses, get_analysis_by_filename, get_user_name_by_email
 
 layout = html.Div([
-    dcc.Location(id="analysis-url", refresh=False),  # 👈 URL parametresi için
     html.H2("Analiz Sayfası", style={"text-align": "center", "color": "#00FF00"}),
-    html.Button("📊 En Son Analizi Göster", id="start-analysis", className="btn btn-success"),
-    html.Div(id="analysis-output")
+
+    html.P("🔽 Lütfen görüntülemek istediğiniz analiz dosyasını seçin:", style={"text-align": "center"}),
+    dcc.Dropdown(id="analysis-dropdown", style={"width": "50%", "margin": "auto", "color": "#000"}),
+
+    html.Button("📊 Analizi Göster", id="start-analysis", className="btn btn-success", style={"margin-top": "20px"}),
+
+    html.Div(id="analysis-output", style={"margin-top": "30px"})
 ], style={
     "backgroundColor": "#000000",
     "color": "#00FF00",
@@ -23,45 +24,38 @@ layout = html.Div([
 
 
 @callback(
+    Output("analysis-dropdown", "options"),
+    Input("start-analysis", "n_clicks"),
+    prevent_initial_call=False
+)
+def populate_dropdown(_):
+    username = get_current_user()
+    analyses = get_user_analyses(username)
+    return [{"label": f"{a['filename']} – {a['timestamp']}", "value": a["filename"]} for a in analyses]
+
+
+@callback(
     Output("analysis-output", "children"),
     Input("start-analysis", "n_clicks"),
-    Input("analysis-url", "search")
+    State("analysis-dropdown", "value"),
+    prevent_initial_call=True
 )
-def show_analysis(n, search):
-    result = None
-    filename = None
+def show_analysis(n_clicks, selected_filename):
+    if not selected_filename:
+        return html.Div("❌ Lütfen bir analiz seçin.")
 
-    # 👀 Eğer URL'de ?id=... varsa, MongoDB'den çek
-    if search:
-        parsed = urlparse.urlparse(search)
-        params = parse_qs(parsed.query)
-        if "id" in params:
-            filename = params["id"][0]
-            data = get_analysis_by_filename(filename)
-            if data:
-                result = data["analysis"]
+    data = get_analysis_by_filename(selected_filename)
+    if not data:
+        return html.Div("❌ Seçilen analiz verisi bulunamadı.")
 
-    # 🎯 Eğer ID yoksa ve butona basıldıysa: tmp'den oku
-    if result is None and n:
-        try:
-            files = [f for f in os.listdir(tmp_dir) if f.endswith(".json")]
-            if not files:
-                return html.Div("❌ Analiz verisi bulunamadı.")
-            latest_file = max(files, key=lambda f: os.path.getctime(os.path.join(tmp_dir, f)))
-            json_path = os.path.join(tmp_dir, latest_file)
-            with open(json_path, "r") as f:
-                result = json.load(f)
-            filename = latest_file
-        except Exception as e:
-            return html.Div(f"❌ Hata: {str(e)}")
-
-    if result is None:
-        return html.Div("📭 Görüntülenecek analiz seçilmedi.")
+    result = data["analysis"]
+    filename = data["filename"]
+    owner_email = data["username"]
+    owner_name = get_user_name_by_email(owner_email)
 
     try:
         # Zaman aralığını hazırla
-        start_time = result["time_range"][0]
-        end_time = result["time_range"][1]
+        start_time, end_time = result.get("time_range", (None, None))
         if start_time and end_time:
             start_str = datetime.datetime.fromtimestamp(start_time).strftime("%Y-%m-%d %H:%M:%S")
             end_str = datetime.datetime.fromtimestamp(end_time).strftime("%Y-%m-%d %H:%M:%S")
@@ -132,6 +126,7 @@ def show_analysis(n, search):
         )
 
         components = [
+            html.P(f"👤 Analizi Yapan: {owner_name}"),
             html.P(f"📄 Dosya: {filename}"),
             html.P(f"📦 Toplam Paket: {result['total_packets']}"),
             html.P(f"📤 Kaynak IP Sayısı: {len(result['unique_src_ips'])}"),

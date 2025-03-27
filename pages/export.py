@@ -1,10 +1,9 @@
 from dash import html, dcc, Input, Output, State, callback
-from database.mongo_operations import get_user_analyses, get_analysis_by_filename
+from database.mongo_operations import get_user_analyses, get_analysis_by_filename, get_user_name_by_email, save_pdf_record
 from utils.user_context import get_current_user
 from utils.pdf_generator import generate_pdf_from_figures
 import plotly.express as px
 import datetime
-from database.mongo_operations import save_pdf_record
 import os
 
 layout = html.Div([
@@ -45,6 +44,7 @@ def generate_selected_pdf(n_clicks, selected_filename):
         data = get_analysis_by_filename(selected_filename)
         result = data["analysis"]
         username = data["username"]
+        name = get_user_name_by_email(username)
 
         # Grafikler
         protocol_data = result["protocols"]
@@ -78,9 +78,10 @@ def generate_selected_pdf(n_clicks, selected_filename):
             figures_dict=figures,
             meta_info={
                 "Dosya": selected_filename,
-                "Kullanıcı": username,
+                "Kullanıcı": name,
                 "Tarih": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }
+            },
+            username=username
         )
 
         # MongoDB’ye kaydet
@@ -96,5 +97,3 @@ def generate_selected_pdf(n_clicks, selected_filename):
 
     except Exception as e:
         return f"❌ Hata: {str(e)}"
-
-    

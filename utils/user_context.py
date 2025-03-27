@@ -1,4 +1,3 @@
-import os
 
 def set_current_user(username):
     with open("tmp/user", "w") as file:
@@ -9,4 +8,8 @@ def get_current_user():
         return file.read()  # <-- eksik olan return eklendi
 
 def remove_current_user():
-    os.remove("user")
+    import os
+    try:
+        os.remove("tmp/user")
+    except FileNotFoundError:
+        pass
