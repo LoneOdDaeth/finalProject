@@ -5,7 +5,6 @@ from database.mongo_operations import *
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 from database.mongo_operations import is_admin
-from database.mongo_operations import get_user_name_by_email
 
 username = get_current_user()
 json_dir = "tmp/json"
@@ -61,9 +60,8 @@ def render_profile(search):
     user_analyses = get_user_analyses(selected_user)
 
     yetki = "Yönetici" if is_admin(selected_user) else "Kullanıcı"
-    name = get_user_name_by_email(selected_user)
     user_info = html.Div([
-        html.P(f"👤 Kullanıcı: {name}", style={"font-size": "18px"}),
+        html.P(f"👤 Kullanıcı (E-posta): {selected_user}", style={"font-size": "18px"}),
         html.P(f"🔰 Yetki: {yetki}")
     ])
 
@@ -85,15 +83,13 @@ def render_profile(search):
         for a in user_analyses
     ]) if user_analyses else html.P("Bu kullanıcı için analiz bulunamadı.")
 
-
     all_users = get_all_users()
     user_links = html.Ul([
         html.Li(dcc.Link(
-            get_user_name_by_email(user["_id"]),
+            user["_id"],
             href=f"/profile?user={user['_id']}"
         )) for user in all_users if user["_id"] != current_user
     ])
-
 
     # 👥 Kullanıcı listesi sadece adminlerde gözüksün
     if is_admin(current_user):
@@ -103,7 +99,6 @@ def render_profile(search):
         ])
     else:
         user_list_section = html.Div()
-
 
     user_pdfs = get_user_pdfs(selected_user)
 
@@ -127,7 +122,6 @@ def render_profile(search):
         for pdf in user_pdfs
     ]) if user_pdfs else html.P("Bu kullanıcıya ait PDF raporu bulunamadı.")
 
-
     pdf_list_section = html.Div([
         html.H4("📄 PDF Rapor Geçmişi:"),
         pdf_list
@@ -143,8 +137,6 @@ def render_profile(search):
         admin_link = html.Div()
 
     return user_info, analysis_list, user_list_section, html.Div([pdf_list_section, admin_link])
-
-
 
 
 @callback(
@@ -171,6 +163,7 @@ def delete_analysis(n_clicks_list, ids):
         os.remove(json_path)
 
     return f"🗑️ '{filename}' adlı analiz başarıyla silindi. Sayfayı yenileyin."
+
 
 @callback(
     Output("pdf-open-feedback", "children"),

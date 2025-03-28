@@ -10,11 +10,10 @@ analyses_collection = db["analyses"]
 pdf_reports_collection = db["pdf_reports"]
 
 # 👤 Kullanıcı Kaydet
-def saveUser(name, email, password):
+def saveUser(email, password):
     encryptedPassword, key = aes_encrypt(password)
     data = {
         "_id": email,  # e-posta adresi
-        "name": name,  # isim soyisim
         "password": encryptedPassword,
         "key": key
     }
@@ -110,7 +109,3 @@ def remove_admin(target_email, requested_by):
 
     admin_collection.delete_one({"_id": target_email})
     return True, f"🗑️ {target_email} admin listesinden silindi."
-
-def get_user_name_by_email(email):
-    user = users_collection.find_one({"_id": email})
-    return user["name"] if user and "name" in user else email

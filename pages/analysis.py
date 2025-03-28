@@ -4,7 +4,7 @@ import json
 import datetime
 import plotly.express as px
 from utils.user_context import get_current_user
-from database.mongo_operations import get_user_analyses, get_analysis_by_filename, get_user_name_by_email
+from database.mongo_operations import get_user_analyses, get_analysis_by_filename
 
 layout = html.Div([
     html.H2("Analiz Sayfası", style={"text-align": "center", "color": "#00FF00"}),
@@ -51,7 +51,6 @@ def show_analysis(n_clicks, selected_filename):
     result = data["analysis"]
     filename = data["filename"]
     owner_email = data["username"]
-    owner_name = get_user_name_by_email(owner_email)
 
     try:
         # Zaman aralığını hazırla
@@ -126,7 +125,7 @@ def show_analysis(n_clicks, selected_filename):
         )
 
         components = [
-            html.P(f"👤 Analizi Yapan: {owner_name}"),
+            html.P(f"👤 Analizi Yapan: {owner_email}"),
             html.P(f"📄 Dosya: {filename}"),
             html.P(f"📦 Toplam Paket: {result['total_packets']}"),
             html.P(f"📤 Kaynak IP Sayısı: {len(result['unique_src_ips'])}"),

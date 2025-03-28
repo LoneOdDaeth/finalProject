@@ -26,11 +26,9 @@ def run_dash():
     subprocess.run(["python", "app.py"])
 
 def signup():
-    name = name_entry.get()
     email = email_entry.get()
     password = password_entry.get()
 
-    name_entry.delete(0, tk.END)
     email_entry.delete(0, tk.END)
     password_entry.delete(0, tk.END)
 
@@ -42,14 +40,12 @@ def signup():
     if email in username_list:
         messagebox.showerror("HATA", "Bu e-posta adresi zaten kayıtlı!")
     else:
-        saveUser(name, email, password)
-        messagebox.showinfo("Kayıt Başarılı", f"Hoş geldiniz {name}!")
+        saveUser(email, password)
+        messagebox.showinfo("Kayıt Başarılı", f"Hoş geldiniz {email}!")
 
 def login():
-    name = name_entry.get()
     email = email_entry.get()
     password = password_entry.get()
-    name_entry.delete(0, tk.END)
     email_entry.delete(0, tk.END)
     password_entry.delete(0, tk.END)
 
@@ -59,7 +55,7 @@ def login():
 
     passData = getUserPass(email)
     if passData == password:
-        set_current_user(name)
+        set_current_user(email)
         messagebox.showinfo("Giriş Başarılı", "Hoş geldiniz!")
         switch_to_new_page()
     elif passData == 0:
@@ -79,7 +75,6 @@ def switch_to_new_page():
     title_bar = tk.Frame(root, bg=COLORS["bg"], relief="raised", bd=2)
     title_bar.pack(side="top", fill="x")
 
-    name = get_user_name_by_email(email)
     title_label = tk.Label(title_bar, text=email, bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"])
     title_label.pack(side="left", padx=10)
 
@@ -128,28 +123,23 @@ bg_photo = ImageTk.PhotoImage(bg_image)
 
 tk.Label(root, image=bg_photo).place(relwidth=1, relheight=1)
 
-main_frame = tk.Frame(root, bg=COLORS["bg"], bd=2, relief="ridge", width=400, height=300)
-main_frame.place(x=760, y=420)
+main_frame = tk.Frame(root, bg=COLORS["bg"], bd=2, relief="ridge", width=400, height=250)
+main_frame.place(x=760, y=450)
 main_frame.pack_propagate(False)
 
-# İsim Soyisim
-tk.Label(main_frame, text="İsim Soyisim", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).grid(row=0, column=0, padx=(20, 10), pady=10, sticky="w")
-name_entry = tk.Entry(main_frame, bg=COLORS["entry_bg"], fg=COLORS["fg"], font=FONTS["entry"], insertbackground='white', width=25)
-name_entry.grid(row=0, column=1, ipady=5, pady=10, sticky="w")
-
 # E-posta
-tk.Label(main_frame, text="Gmail Adresi", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).grid(row=1, column=0, padx=(20, 10), pady=10, sticky="w")
+tk.Label(main_frame, text="Gmail Adresi", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).grid(row=0, column=0, padx=(20, 10), pady=10, sticky="w")
 email_entry = tk.Entry(main_frame, bg=COLORS["entry_bg"], fg=COLORS["fg"], font=FONTS["entry"], insertbackground='white', width=25)
-email_entry.grid(row=1, column=1, ipady=5, pady=10, sticky="w")
+email_entry.grid(row=0, column=1, ipady=5, pady=10, sticky="w")
 
 # Şifre
-tk.Label(main_frame, text="Parola", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).grid(row=2, column=0, padx=(20, 10), pady=10, sticky="w")
+tk.Label(main_frame, text="Parola", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).grid(row=1, column=0, padx=(20, 10), pady=10, sticky="w")
 password_entry = tk.Entry(main_frame, show="*", bg=COLORS["entry_bg"], fg=COLORS["fg"], font=FONTS["entry"], insertbackground='white', width=25)
-password_entry.grid(row=2, column=1, ipady=5, pady=10, sticky="w")
+password_entry.grid(row=1, column=1, ipady=5, pady=10, sticky="w")
 
 # Butonlar
 button_frame = tk.Frame(main_frame, bg=COLORS["bg"])
-button_frame.grid(row=3, column=0, columnspan=2, pady=20)
+button_frame.grid(row=2, column=0, columnspan=2, pady=20)
 
 tk.Button(button_frame, text="Giriş Yap", command=login, bg=COLORS["button_bg"], fg=COLORS["fg"],
           activebackground=COLORS["button_active_bg"]["login"], activeforeground=COLORS["button_active_fg"],

@@ -1,7 +1,7 @@
 from dash import html, dcc, Input, Output, State, callback
 from utils.user_context import get_current_user
 from database.mongo_operations import (
-    is_admin, get_admin_list, add_admin, get_all_users, remove_admin, get_user_name_by_email
+    is_admin, get_admin_list, add_admin, get_all_users, remove_admin
 )
 
 layout = html.Div([
@@ -73,7 +73,7 @@ layout = html.Div([
 )
 def update_admin_dropdown(_, add_feedback, remove_feedback):
     admin_list = get_admin_list()
-    return [{"label": get_user_name_by_email(admin["_id"]), "value": admin["_id"]} for admin in admin_list]
+    return [{"label": admin["_id"], "value": admin["_id"]} for admin in admin_list]
 
 
 @callback(
@@ -83,7 +83,7 @@ def update_admin_dropdown(_, add_feedback, remove_feedback):
 )
 def populate_user_dropdown(n):
     users = get_all_users()
-    return [{"label": get_user_name_by_email(user["_id"]), "value": user["_id"]} for user in users]
+    return [{"label": user["_id"], "value": user["_id"]} for user in users]
 
 
 @callback(
@@ -125,4 +125,4 @@ def handle_remove_admin(n_clicks, selected_admin_email):
 )
 def update_admin_display(_, __, ___):
     admin_list = get_admin_list()
-    return [html.Li(get_user_name_by_email(admin["_id"])) for admin in admin_list]
+    return [html.Li(admin["_id"]) for admin in admin_list]
