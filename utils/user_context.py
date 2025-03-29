@@ -1,4 +1,3 @@
-
 def set_current_user(username):
     with open("tmp/user", "w") as file:
         file.write(username)

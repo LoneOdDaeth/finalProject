@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from pages import home, profile, analysis, export  # Modüler sayfaları içe aktarıyoruz
+from pages import home, profile, analysis, export, settings
 import threading
 import webbrowser
 from utils.user_context import remove_current_user
@@ -20,6 +20,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("Ana Sayfa", href="/")),
+        dbc.NavItem(dbc.NavLink("Ayarlar", href="/settings")),
         dbc.NavItem(dbc.NavLink("Analiz", href="/analysis")),
         dbc.NavItem(dbc.NavLink("Profil", href="/profile")),
         dbc.NavItem(dbc.NavLink("Dışa Aktarma & Mail", href="/export")),
@@ -52,6 +53,8 @@ def display_page(pathname):
         return export.layout
     elif pathname == "/admin":
         return admin.layout
+    elif pathname == "/settings":
+        return settings.layout
     elif pathname == "/logout":
         remove_current_user()
 
