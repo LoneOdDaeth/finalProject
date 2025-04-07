@@ -2,19 +2,23 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from pages import home, profile, analysis, export, settings
+from pages import home, profile, analysis, export, settings, mail_interface, admin
+from utils.user_context import remove_current_user
 import threading
 import webbrowser
-from utils.user_context import remove_current_user
 import os
 import time
-from pages import admin
 
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:8050")
 
-# Dash Uygulamasını Başlat
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+# Dash Uygulamasını Başlat (GÜNCELLEME BURADA ⬇)
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.DARKLY],
+    suppress_callback_exceptions=True  # 🛡️ Bu kritik satır!
+)
+server = app.server  # Eğer dışarıdan deploy yapılacaksa
 
 # Navbar (Menü)
 navbar = dbc.NavbarSimple(
@@ -23,7 +27,8 @@ navbar = dbc.NavbarSimple(
         dbc.NavItem(dbc.NavLink("Ayarlar", href="/settings")),
         dbc.NavItem(dbc.NavLink("Analiz", href="/analysis")),
         dbc.NavItem(dbc.NavLink("Profil", href="/profile")),
-        dbc.NavItem(dbc.NavLink("Dışa Aktarma & Mail", href="/export")),
+        dbc.NavItem(dbc.NavLink("Dışa Aktarma", href="/export")),
+        dbc.NavItem(dbc.NavLink("Mail", href="/mail-interface")),
         dbc.NavItem(dbc.NavLink("Çıkış Yap", href="/logout", style={"color": "red"}))
     ],
     brand="PCAP Analiz Arayüzü",
@@ -32,14 +37,14 @@ navbar = dbc.NavbarSimple(
     dark=True,
 )
 
-# Sayfa İçeriği Güncelleme
+# Sayfa İçeriği
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     navbar,
     html.Div(id="page-content")
 ])
 
-# Sayfa Yönlendirme
+# Sayfa Yönlendirme Callback
 @app.callback(
     Output("page-content", "children"),
     [Input("url", "pathname")]
@@ -55,24 +60,28 @@ def display_page(pathname):
         return admin.layout
     elif pathname == "/settings":
         return settings.layout
+    elif pathname == "/mail-interface":
+        return mail_interface.layout
     elif pathname == "/logout":
         remove_current_user()
 
-        # Kullanıcıya sade bir mesaj göster
+        # Uygulamayı kapatmadan önce kullanıcıya mesaj göster
         def delayed_exit():
-            time.sleep(1)  # 2 saniye bekle, sonra kapat
+            time.sleep(1)
             os._exit(0)
 
         threading.Thread(target=delayed_exit, daemon=True).start()
 
-        # Kullanıcıya sade ve izole bir mesaj göster
         return html.Div([
             html.H2("🔒 Oturum Sonlandırıldı", style={
                 "text-align": "center",
                 "color": "#FF4444",
                 "margin-top": "200px"
             }),
-            html.P("Uygulama kapatılıyor...", style={"text-align": "center", "color": "#FFFFFF"})
+            html.P("Uygulama kapatılıyor...", style={
+                "text-align": "center",
+                "color": "#FFFFFF"
+            })
         ], style={
             "backgroundColor": "#000000",
             "height": "100vh",
@@ -86,7 +95,7 @@ def display_page(pathname):
     else:
         return home.layout
 
-# Uygulamayı Çalıştır
+# Uygulamayı Başlat
 if __name__ == "__main__":
     threading.Timer(1.5, open_browser).start()
     app.run(debug=False, port=8050)

@@ -1,6 +1,8 @@
 from crypto.cryptoSaveMaterials import *
 from pymongo import MongoClient
 from datetime import datetime
+import os
+from typing import Optional
 
 client = MongoClient("mongodb://localhost:27017/")
 db = client["Erlik"]
@@ -8,6 +10,7 @@ users_collection = db["users"]
 admin_collection = db["admins"]
 analyses_collection = db["analyses"]
 pdf_reports_collection = db["pdf_reports"]
+smtp_settings_collection = db["smtp_settings"]
 
 # 👤 Kullanıcı Kaydet
 def saveUser(email, password):
@@ -109,3 +112,59 @@ def remove_admin(target_email, requested_by):
 
     admin_collection.delete_one({"_id": target_email})
     return True, f"🗑️ {target_email} admin listesinden silindi."
+
+# 💾 SMTP Ayarlarını Kaydet/Güncelle
+def save_smtp_settings(email, host, port, tls, username, password):
+    encrypted_password, key = aes_encrypt(password)
+
+    smtp_doc = {
+        "_id": email,  # kullanıcı maili (tekil tutar)
+        "host": host,
+        "port": port,
+        "tls": tls,
+        "username": username,
+        "password": encrypted_password,
+        "key": key,
+        "updated_at": datetime.utcnow().isoformat()
+    }
+
+    smtp_settings_collection.replace_one({"_id": email}, smtp_doc, upsert=True)
+
+# 📥 SMTP Ayarlarını Getir
+def get_smtp_settings(email):
+    doc = smtp_settings_collection.find_one({"_id": email})
+    if not doc:
+        return None
+
+    try:
+        decrypted_password = aes_dcrypted(doc["password"], doc["key"])
+    except:
+        decrypted_password = ""
+
+    return {
+        "host": doc.get("host", ""),
+        "port": doc.get("port", ""),
+        "tls": doc.get("tls", None),
+        "username": doc.get("username", ""),
+        "password": decrypted_password
+    }
+
+def get_analysis_files(user: Optional[str] = None):
+    analysis_path = "data/analysis"
+    all_files = []
+
+    if not os.path.exists(analysis_path):
+        return []
+
+    for filename in os.listdir(analysis_path):
+        full_path = os.path.join(analysis_path, filename)
+        if os.path.isfile(full_path):
+            # admin → tüm dosyaları görsün
+            if user is None or is_admin(user):
+                all_files.append(full_path)
+            else:
+                # kullanıcı sadece kendi analizlerini görsün
+                if filename.startswith(user + "_"):
+                    all_files.append(full_path)
+
+    return all_files
