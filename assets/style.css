@@ -1,0 +1,35 @@
+/* Genel link stili */
+.custom-link {
+    font-size: 18px;
+    color: #CCCCCC;
+    font-weight: normal;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    display: block;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+/* Üzerine gelindiğinde hafif parlaklık */
+.custom-link:hover {
+    background-color: #2a2a2a;
+    color: #EEEEEE;
+}
+
+/* Aktif (seçili) sayfa linki */
+.custom-link.active {
+    color: #00FF00 !important;
+    background-color: #333333 !important;
+    font-weight: bold;
+}
+
+/* Çıkış için özel görünüm */
+.custom-link.logout-link {
+    color: #FF4444;
+}
+
+.custom-link.logout-link.active {
+    color: #FF8888 !important;
+    background-color: #330000 !important;
+}

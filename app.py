@@ -24,20 +24,29 @@ server = app.server
 sidebar = html.Div([
     html.H3("🧠 Erlik", style={"color": "#00FF00", "margin-bottom": "30px"}),
 
-    dbc.Nav([
-        dbc.NavLink("👤 Profil", href="/profile", active="exact"),
-        dbc.NavLink("📊 Analiz", href="/analysis", active="exact"),
-        dbc.NavLink("📄 PDF & Dışa Aktar", href="/export", active="exact"),
-        dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact"),
-        dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact"),
-        dbc.NavLink("🚪 Çıkış", href="/logout", style={"color": "red"}, active="exact"),
-    ], vertical=True, pills=True)
+    html.Div([  # Menü kısmı
+        dbc.Nav([
+            dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
+            dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
+            dbc.NavLink("📄 PDF & Dışa Aktar", href="/export", active="exact", className="custom-link"),
+            dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact", className="custom-link"),
+            dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
+        ], vertical=True, pills=True)
+    ]),
+
+    html.Div([  # Çıkış kısmı
+        dbc.NavLink("🚪 Çıkış", href="/logout", active="exact", className="custom-link logout-link"),
+    ], style={"margin-top": "auto"})  # otomatik alta yasla
 ], style={
     "width": "250px",
     "backgroundColor": "#1c1c1c",
     "padding": "20px",
-    "height": "100vh"
+    "height": "100vh",
+    "display": "flex",
+    "flexDirection": "column",
+    "justifyContent": "space-between"
 })
+
 
 # Sayfa İçeriği
 app.layout = html.Div([
