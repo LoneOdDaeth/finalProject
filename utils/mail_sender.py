@@ -2,7 +2,8 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from typing import List, Optional, Tuple
-from database.mongo_operations import get_smtp_settings
+from database.mongo_operations import get_smtp_settings, save_mail_log
+import os
 
 def send_mail(
     sender_email: str,
@@ -42,7 +43,7 @@ def send_mail(
                 try:
                     with open(file_path, "rb") as f:
                         file_data = f.read()
-                        file_name = file_path.split("/")[-1]
+                        file_name = os.path.basename(file_path)
                         msg.add_attachment(file_data, maintype="application", subtype="octet-stream", filename=file_name)
                 except Exception as e:
                     return False, f"❌ Ek dosya okunamadı: {file_path}\nHata: {str(e)}"
@@ -59,6 +60,10 @@ def send_mail(
             with smtplib.SMTP_SSL(host, port, context=context) as server:
                 server.login(username, password)
                 server.send_message(msg)
+
+        # ✅ LOG KAYDI
+        attachment_name = os.path.basename(attachments[0]) if attachments else None
+        save_mail_log(sender_email, to_email, subject, attachment_name)
 
         return True, "✅ Mail başarıyla gönderildi."
 

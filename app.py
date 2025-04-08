@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from pages import home, profile, analysis, export, settings, mail_interface, admin
+from pages import profile, analysis, export, settings, admin
 from utils.user_context import remove_current_user
 import threading
 import webbrowser
@@ -12,37 +12,43 @@ import time
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:8050")
 
-# Dash Uygulamasını Başlat (GÜNCELLEME BURADA ⬇)
+# Dash Uygulamasını Başlat
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.DARKLY],
-    suppress_callback_exceptions=True  # 🛡️ Bu kritik satır!
+    suppress_callback_exceptions=True
 )
-server = app.server  # Eğer dışarıdan deploy yapılacaksa
+server = app.server
 
-# Navbar (Menü)
-navbar = dbc.NavbarSimple(
-    children=[
-        dbc.NavItem(dbc.NavLink("Ana Sayfa", href="/")),
-        dbc.NavItem(dbc.NavLink("Ayarlar", href="/settings")),
-        dbc.NavItem(dbc.NavLink("Analiz", href="/analysis")),
-        dbc.NavItem(dbc.NavLink("Profil", href="/profile")),
-        dbc.NavItem(dbc.NavLink("Dışa Aktarma", href="/export")),
-        dbc.NavItem(dbc.NavLink("Mail", href="/mail-interface")),
-        dbc.NavItem(dbc.NavLink("Çıkış Yap", href="/logout", style={"color": "red"}))
-    ],
-    brand="PCAP Analiz Arayüzü",
-    brand_href="/",
-    color="gray",
-    dark=True,
-)
+# Sidebar (Yana alınmış menü)
+sidebar = html.Div([
+    html.H3("🧠 Erlik", style={"color": "#00FF00", "margin-bottom": "30px"}),
+
+    dbc.Nav([
+        dbc.NavLink("👤 Profil", href="/profile", active="exact"),
+        dbc.NavLink("📊 Analiz", href="/analysis", active="exact"),
+        dbc.NavLink("📄 PDF & Dışa Aktar", href="/export", active="exact"),
+        dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact"),
+        dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact"),
+        dbc.NavLink("🚪 Çıkış", href="/logout", style={"color": "red"}, active="exact"),
+    ], vertical=True, pills=True)
+], style={
+    "width": "250px",
+    "backgroundColor": "#1c1c1c",
+    "padding": "20px",
+    "height": "100vh"
+})
 
 # Sayfa İçeriği
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
-    navbar,
-    html.Div(id="page-content")
-])
+    html.Div([sidebar], style={"width": "250px"}),
+    html.Div(id="page-content", style={"flex": 1, "padding": "20px"})
+], style={
+    "display": "flex",
+    "height": "100vh",
+    "backgroundColor": "#000000"
+})
 
 # Sayfa Yönlendirme Callback
 @app.callback(
@@ -60,12 +66,9 @@ def display_page(pathname):
         return admin.layout
     elif pathname == "/settings":
         return settings.layout
-    elif pathname == "/mail-interface":
-        return mail_interface.layout
     elif pathname == "/logout":
         remove_current_user()
 
-        # Uygulamayı kapatmadan önce kullanıcıya mesaj göster
         def delayed_exit():
             time.sleep(1)
             os._exit(0)
@@ -91,11 +94,10 @@ def display_page(pathname):
             "alignItems": "center",
             "font-family": "Arial, sans-serif"
         })
-
     else:
-        return home.layout
+        return profile.layout
 
 # Uygulamayı Başlat
 if __name__ == "__main__":
     threading.Timer(1.5, open_browser).start()
-    app.run(debug=False, port=8050)
+    app.run(debug=True, port=8050)

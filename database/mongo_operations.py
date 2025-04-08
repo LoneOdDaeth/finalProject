@@ -11,6 +11,7 @@ admin_collection = db["admins"]
 analyses_collection = db["analyses"]
 pdf_reports_collection = db["pdf_reports"]
 smtp_settings_collection = db["smtp_settings"]
+mail_logs_collection = db["mail_logs"]
 
 # 👤 Kullanıcı Kaydet
 def saveUser(email, password):
@@ -114,7 +115,7 @@ def remove_admin(target_email, requested_by):
     return True, f"🗑️ {target_email} admin listesinden silindi."
 
 # 💾 SMTP Ayarlarını Kaydet/Güncelle
-def save_smtp_settings(email, host, port, tls, username, password):
+def save_smtp_settings(email, host, port, tls, username, password, default_message=""):
     encrypted_password, key = aes_encrypt(password)
 
     smtp_doc = {
@@ -125,10 +126,12 @@ def save_smtp_settings(email, host, port, tls, username, password):
         "username": username,
         "password": encrypted_password,
         "key": key,
-        "updated_at": datetime.utcnow().isoformat()
+        "updated_at": datetime.utcnow().isoformat(),
+        "default_message": default_message
     }
 
     smtp_settings_collection.replace_one({"_id": email}, smtp_doc, upsert=True)
+
 
 # 📥 SMTP Ayarlarını Getir
 def get_smtp_settings(email):
@@ -146,25 +149,18 @@ def get_smtp_settings(email):
         "port": doc.get("port", ""),
         "tls": doc.get("tls", None),
         "username": doc.get("username", ""),
-        "password": decrypted_password
+        "password": decrypted_password,
+        "default_message": doc.get("default_message", "")
     }
 
-def get_analysis_files(user: Optional[str] = None):
-    analysis_path = "data/analysis"
-    all_files = []
+def save_mail_log(sender, recipient, subject, attachment_name=None):
+    mail_logs_collection.insert_one({
+        "timestamp": datetime.utcnow().isoformat(),
+        "sender": sender,
+        "recipient": recipient,
+        "subject": subject,
+        "attachment_name": attachment_name or ""
+    })
 
-    if not os.path.exists(analysis_path):
-        return []
-
-    for filename in os.listdir(analysis_path):
-        full_path = os.path.join(analysis_path, filename)
-        if os.path.isfile(full_path):
-            # admin → tüm dosyaları görsün
-            if user is None or is_admin(user):
-                all_files.append(full_path)
-            else:
-                # kullanıcı sadece kendi analizlerini görsün
-                if filename.startswith(user + "_"):
-                    all_files.append(full_path)
-
-    return all_files
+def get_all_mail_logs():
+    return list(mail_logs_collection.find().sort("timestamp", -1))

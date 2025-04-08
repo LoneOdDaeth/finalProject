@@ -1,7 +1,8 @@
 from dash import html, dcc, Input, Output, State, callback
 from utils.user_context import get_current_user
+import datetime
 from database.mongo_operations import (
-    is_admin, get_admin_list, add_admin, get_all_users, remove_admin
+    is_admin, get_admin_list, add_admin, get_all_users, remove_admin, get_all_mail_logs
 )
 
 layout = html.Div([
@@ -54,7 +55,11 @@ layout = html.Div([
             html.Div(id="remove-admin-feedback", style={"margin-top": "15px", "color": "#FF4444"})
         ], style={"flex": "1"})
 
-    ], style={"display": "flex", "gap": "20px", "margin-top": "30px", "flex-wrap": "wrap"})
+    ], style={"display": "flex", "gap": "20px", "margin-top": "30px", "flex-wrap": "wrap"}),
+
+    # 🔽 Yeni eklenen mail log alanı
+    html.Hr(style={"margin": "40px 0"}),
+    html.Div(id="mail-log-section", style={"margin-top": "30px"})
 
 ], style={
     "backgroundColor": "#000000",
@@ -62,7 +67,6 @@ layout = html.Div([
     "padding": "20px",
     "font-family": "Arial, sans-serif"
 })
-
 
 @callback(
     Output("admin-remove-dropdown", "options"),
@@ -126,3 +130,37 @@ def handle_remove_admin(n_clicks, selected_admin_email):
 def update_admin_display(_, __, ___):
     admin_list = get_admin_list()
     return [html.Li(admin["_id"]) for admin in admin_list]
+
+@callback(
+    Output("mail-log-section", "children"),
+    Input("admin-url", "pathname"),
+    prevent_initial_call=False
+)
+def render_mail_logs(_):
+    logs = get_all_mail_logs()
+    if not logs:
+        return html.P("📭 Henüz gönderilen mail kaydı yok.", style={"color": "gray"})
+
+    headers = ["Tarih", "Gönderen", "Alıcı", "Konu", "Dosya Adı"]
+    table_head = html.Tr([html.Th(h) for h in headers])
+
+    table_rows = []
+    for log in logs:
+        time = datetime.datetime.fromisoformat(log["timestamp"]).strftime("%d.%m.%Y %H:%M")
+        table_rows.append(html.Tr([
+            html.Td(time),
+            html.Td(log["sender"]),
+            html.Td(log["recipient"]),
+            html.Td(log["subject"]),
+            html.Td(log.get("attachment_name", "—"))
+        ]))
+
+    return html.Div([
+        html.H4("📬 Gönderilen Mail Kayıtları", style={"margin-bottom": "20px"}),
+        html.Table([table_head] + table_rows, style={
+            "width": "100%",
+            "border": "1px solid #00FF00",
+            "borderCollapse": "collapse",
+            "textAlign": "left"
+        })
+    ])

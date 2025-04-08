@@ -27,7 +27,8 @@ def load_settings_content(password_visible):
         "port": "",
         "tls": None,
         "username": "",
-        "password": ""
+        "password": "",
+        "default_message": ""
     }
 
     warning = html.Div()
@@ -71,10 +72,18 @@ def load_settings_content(password_visible):
             value=smtp_data.get("password", "")
         ),
 
+        html.Label("✏️ Varsayılan Mail Mesajı (hızlı paylaşım için):"),
+        dcc.Textarea(
+            id="default-mail-message",
+            style={"width": "100%", "height": "100px"},
+            value=smtp_data.get("default_message", "")
+        ),
+
         html.Button("💾 Ayarları Kaydet", id="save-settings-btn", className="btn btn-success", style={"margin-top": "20px"}),
 
         html.Div(id="settings-feedback", style={"margin-top": "20px", "color": "lime"})
     ])
+
 
 @callback(
     Output("settings-feedback", "children"),
@@ -85,9 +94,10 @@ def load_settings_content(password_visible):
     State("smtp-username", "value"),
     State("smtp-password", "value"),
     State("sender-email", "value"),
+    State("default-mail-message", "value"),
     prevent_initial_call=True
 )
-def save_settings(n_clicks, host, port, tls, username, password, sender_email):
+def save_settings(n_clicks, host, port, tls, username, password, sender_email, default_message):
     if not all([host, port, tls is not None, username, password]):
         return "❌ Lütfen tüm alanları doldurun."
 
@@ -97,10 +107,11 @@ def save_settings(n_clicks, host, port, tls, username, password, sender_email):
         port=port,
         tls=tls,
         username=username,
-        password=password
+        password=password,
+        default_message=default_message
     )
 
     return html.Div([
         html.P("✅ SMTP ayarları kaydedildi."),
-        html.P(f"🔐 Kaydedilen şifre: {password}", style={"color": "orange"})
+        html.P(f"✏️ Varsayılan mesaj: {default_message[:50]}...", style={"color": "orange"})
     ])
