@@ -21,21 +21,35 @@ app = dash.Dash(
 server = app.server
 
 # Sidebar (Yana alınmış menü)
-sidebar = dbc.NavbarSimple([
+sidebar = html.Div([
+    html.H3("🧠 Erlik", style={
+        "color": "var(--text-green)",
+        "margin-bottom": "30px",
+        "textAlign": "center"
+    }),
+
     html.Div([
-        html.H2("🧠 Erlik", style={"color": "#2ecc71", "marginBottom": "40px"}),
+        dbc.Nav([
+            dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
+            dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
+            dbc.NavLink("📄 PDF & Rapor", href="/export", active="exact", className="custom-link"),
+            dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact", className="custom-link"),
+            dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
+        ], vertical=True, pills=True)
+    ]),
 
-        dcc.Link("👤 Profil", href="/profile", className="custom-link", id="link-profile"),
-        dcc.Link("📊 Analiz", href="/analysis", className="custom-link", id="link-analysis"),
-        dcc.Link("📄 PDF & Rapor", href="/export", className="custom-link", id="link-export"),
-        dcc.Link("⚙️ Ayarlar", href="/settings", className="custom-link", id="link-settings"),
-        dcc.Link("🛠️ Admin Paneli", href="/admin", className="custom-link", id="link-admin"),
-
-        html.Div([
-            dcc.Link("📜 Çıkış", href="/logout", className="custom-link logout-link")
-        ], style={"marginTop": "auto"})
-    ], className="sidebar-container")
-], color="dark", dark=True)
+    html.Div([
+        dbc.NavLink("🚪 Çıkış", href="/logout", active="exact", className="custom-link logout-link"),
+    ], style={"margin-top": "auto"})
+], className="sidebar-container", style={
+    "width": "250px",
+    "backgroundColor": "#1c1c1c",
+    "padding": "20px",
+    "height": "100vh",
+    "display": "flex",
+    "flexDirection": "column",
+    "justifyContent": "space-between"
+})
 
 # Header bileşeni
 header_bar = html.Div([
@@ -55,13 +69,14 @@ header_bar = html.Div([
 ], style={
     "width": "100%",
     "height": "100px",
-    "backgroundColor": "#1c1c24",
+    "backgroundColor": "#1c1c1e",
     "padding": "10px 20px",
     "fontSize": "18px",
     "borderBottom": "2px solid #2ecc71",
     "display": "flex",
     "alignItems": "center",
-    "justifyContent": "space-between"
+    "justifyContent": "space-between",
+    "border-bottom": "none"
 })
 
 
@@ -135,15 +150,15 @@ def display_page(pathname):
 )
 def update_header(pathname):
     page_names = {
-        "/profile": "Profil Sayfası",
-        "/analysis": "Analiz Sayfası",
-        "/export": "PDF & Rapor Sayfası",
+        "/profile": "Profil",
+        "/analysis": "Analiz",
+        "/export": "PDF & Rapor",
         "/settings": "Ayarlar",
         "/admin": "Admin Paneli",
     }
-    return f"{page_names.get(pathname, 'Profil Sayfası')}"
+    return f"{page_names.get(pathname, 'Profil')}"
 
 # Uygulamayı Başlat
 if __name__ == "__main__":
     threading.Timer(1.5, open_browser).start()
-    app.run(debug=False, port=8050)
+    app.run(debug=True, port=8050)

@@ -22,7 +22,7 @@ layout = html.Div([
         ], style={"flex": "0.6", "minWidth": "280px"}),
 
         html.Div([  # Sağ Sütun (biraz daha geniş)
-            html.Div(id="user-mail-log-section", className="profile-card", style={"margin-bottom": "20px", "overflowY": "auto", "maxHeight": "300px", "minHeight": "327px"}),
+            html.Div(id="user-mail-log-section", className="profile-card", style={"margin-bottom": "20px", "overflowY": "auto", "maxHeight": "300px", "minHeight": "320px"}),
             html.Div(id="pdf-history-section", className="profile-card")
         ], style={"flex": "1.4", "minWidth": "380px"})
     ], className="profile-columns", style={"display": "flex", "gap": "20px"}),
@@ -83,110 +83,106 @@ def render_profile(search):
     yetki = "Yönetici" if is_admin(selected_user) else "Kullanıcı"
 
     # Kullanıcı Bilgileri
-    user_info = html.Div([
-        dbc.Card([
-            dbc.CardHeader("Kullanıcı Bilgileri", className="card-header-green"),
-            dbc.CardBody(
+    user_info = html.Div(
+        dbc.Card(
+            html.Div([
+                # Başlık direkt kart içerisinde
+                html.H5("Kullanıcı Bilgileri", className="card-title", style={
+                    "marginBottom": "15px", "color": "white", "fontWeight": "bold"
+                }),
+
+                # Kullanıcı mail ve yetki bilgisi
                 html.Div([
+                    html.P(f"Mail: {selected_user}", style={
+                        "font-size": "16px", "margin": "0", "font-weight": "bold"
+                    }),
+                    html.P(f"Yetki: {yetki}", style={
+                        "font-size": "16px", "margin": "0", "font-weight": "bold"
+                    })
+                ], style={"marginBottom": "12px"}),
 
-                    # Kullanıcı mail ve yetki bilgisi
+                # İki istatistik kutusu
+                html.Div([
+                    # PDF Sayısı Kutusu
                     html.Div([
-                        html.P(f"Mail: {selected_user}", style={
-                            "font-size": "16px", "margin": "0", "font-weight": "bold"
+                        html.P(f"{len(user_pdfs)}", style={
+                            "margin": "0", "fontSize": "26px", "fontWeight": "bold",
+                            "color": "#fff", "textAlign": "center"
                         }),
-                        html.P(f"Yetki: {yetki}", style={
-                            "font-size": "16px", "margin": "0", "font-weight": "bold"
-                        })
-                    ], style={"marginBottom": "12px"}),
-
-                    # İki istatistik kutusu
-                    html.Div([
-
-                        # PDF Sayısı Kutusu
                         html.Div([
-                            html.P(f"{len(user_pdfs)}", style={
-                                "margin": "0", "fontSize": "26px", "fontWeight": "bold",
-                                "color": "#fff", "textAlign": "center"
-                            }),
-                            html.Div([
-                                html.Span("📄", style={"fontSize": "18px", "marginRight": "6px"}),
-                                html.Span("PDF Sayısı", style={
-                                    "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
-                                })
-                            ], style={
-                                "display": "flex",
-                                "justifyContent": "center",
-                                "alignItems": "center",
-                                "marginTop": "8px"
+                            html.Span("📄", style={"fontSize": "18px", "marginRight": "6px"}),
+                            html.Span("PDF Sayısı", style={
+                                "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
                             })
                         ], style={
                             "display": "flex",
-                            "flexDirection": "column",
                             "justifyContent": "center",
                             "alignItems": "center",
-                            "padding": "12px 16px",
-                            "border": "1px solid var(--text-green)",
-                            "borderRadius": "6px",
-                            "flex": "1",
-                            "height": "140px",
-                            "boxSizing": "border-box"
-                        }),
-
-                        # Mail Sayısı Kutusu
-                        html.Div([
-                            html.P(f"{mail_count}", style={
-                                "margin": "0", "fontSize": "26px", "fontWeight": "bold",
-                                "color": "#fff", "textAlign": "center"
-                            }),
-                            html.Div([
-                                html.Span("📧", style={"fontSize": "18px", "marginRight": "6px"}),
-                                html.Span("Mail Sayısı", style={
-                                    "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
-                                })
-                            ], style={
-                                "display": "flex",
-                                "justifyContent": "center",
-                                "alignItems": "center",
-                                "marginTop": "8px"
-                            })
-                        ], style={
-                            "display": "flex",
-                            "flexDirection": "column",
-                            "justifyContent": "center",
-                            "alignItems": "center",
-                            "padding": "12px 16px",
-                            "border": "1px solid var(--text-green)",
-                            "borderRadius": "6px",
-                            "flex": "1",
-                            "height": "140px",
-                            "boxSizing": "border-box"
+                            "marginTop": "8px"
                         })
-
                     ], style={
                         "display": "flex",
-                        "gap": "12px",
-                        "marginTop": "10px"
-                    })
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "alignItems": "center",
+                        "padding": "12px 16px",
+                        "border": "1px solid var(--text-green)",
+                        "borderRadius": "6px",
+                        "flex": "1",
+                        "height": "140px",
+                        "boxSizing": "border-box"
+                    }),
 
+                    # Mail Sayısı Kutusu
+                    html.Div([
+                        html.P(f"{mail_count}", style={
+                            "margin": "0", "fontSize": "26px", "fontWeight": "bold",
+                            "color": "#fff", "textAlign": "center"
+                        }),
+                        html.Div([
+                            html.Span("📧", style={"fontSize": "18px", "marginRight": "6px"}),
+                            html.Span("Mail Sayısı", style={
+                                "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
+                            })
+                        ], style={
+                            "display": "flex",
+                            "justifyContent": "center",
+                            "alignItems": "center",
+                            "marginTop": "8px"
+                        })
+                    ], style={
+                        "display": "flex",
+                        "flexDirection": "column",
+                        "justifyContent": "center",
+                        "alignItems": "center",
+                        "padding": "12px 16px",
+                        "border": "1px solid var(--text-green)",
+                        "borderRadius": "6px",
+                        "flex": "1",
+                        "height": "140px",
+                        "boxSizing": "border-box"
+                    })
                 ], style={
                     "display": "flex",
-                    "flexDirection": "column",
-                    "justifyContent": "space-between",
-                    "flexGrow": "1",
-                    "height": "100%"
-                }),
-                style={
-                    "height": "100%",
-                    "display": "flex",
-                    "flexDirection": "column"
-                }
-            )
-        ], style={
-            "height": "100%",
-            "display": "flex",
-            "flexDirection": "column"
-        })
-    ])
+                    "gap": "12px",
+                    "marginTop": "10px"
+                })
+            ], style={
+                "display": "flex",
+                "flexDirection": "column",
+                "justifyContent": "space-between",
+                "flexGrow": "1",
+                "height": "100%",
+                "padding": "15px"
+            }),
+            style={
+                "height": "100%",
+                "display": "flex",
+                "flexDirection": "column",
+                "backgroundColor": "var(--card-bg-dark)"
+            }
+        )
+    )
 
     # Analizler
     analysis_items = [
@@ -206,17 +202,30 @@ def render_profile(search):
             "justifyContent": "space-between",
             "alignItems": "center",
             "padding": "12px 0",
-            "borderBottom": "1px solid white"  # ← çizgi burada
+            "borderBottom": "1px solid white"
         })
         for a in user_analyses
     ] if user_analyses else [html.P("Bu kullanıcı için analiz bulunamadı.", style={"color": "#AAAAAA"})]
 
-
-    analysis_cards = dbc.Card([
-        dbc.CardHeader("📊 Son Analizler", className="card-header-green"),
-        dbc.CardBody(html.Div(analysis_items))
-    ])
-    user_analyses = html.Div(analysis_cards, className="scrollable-card fixed-card-height")
+    # Analizler kartı
+    user_analyses = html.Div(
+        dbc.Card(
+            html.Div([
+                # Başlık direkt kart içerisinde
+                html.H5("📊 Son Analizler", className="card-title", style={
+                    "marginBottom": "15px", "color": "white", "fontWeight": "bold"
+                }),
+                
+                # Analiz listesi
+                html.Div(analysis_items)
+            ], style={"padding": "15px"}),
+            style={
+                "height": "100%",
+                "backgroundColor": "var(--card-bg-dark)"
+            }
+        ),
+        className="scrollable-card fixed-card-height"
+    )
 
     # PDF Raporları
     pdf_items = [
@@ -251,12 +260,25 @@ def render_profile(search):
         for pdf in user_pdfs
     ] if user_pdfs else [html.P("Bu kullanıcıya ait PDF raporu bulunamadı.", style={"color": "#AAAAAA"})]
 
-
-    pdf_cards = dbc.Card([
-        dbc.CardHeader("📄 PDF Rapor Geçmişi", className="card-header-green"),
-        dbc.CardBody(html.Div(pdf_items))
-    ])
-    pdf_list_section = html.Div(pdf_cards, className="scrollable-card fixed-card-height")
+    # PDF Raporları kartı
+    pdf_list_section = html.Div(
+        dbc.Card(
+            html.Div([
+                # Başlık direkt kart içerisinde
+                html.H5("📄 PDF Rapor Geçmişi", className="card-title", style={
+                    "marginBottom": "15px", "color": "white", "fontWeight": "bold"
+                }),
+                
+                # PDF listesi
+                html.Div(pdf_items)
+            ], style={"padding": "15px"}),
+            style={
+                "height": "100%",
+                "backgroundColor": "var(--card-bg-dark)"
+            }
+        ),
+        className="scrollable-card fixed-card-height"
+    )
 
     # Mail Log
     if selected_user == current_user:
@@ -283,21 +305,43 @@ def render_profile(search):
             ], className="mail-log-row")
         ]
 
-        mail_log_cards = dbc.Card([
-            dbc.CardHeader("📬 Gönderilen Mail Geçmişi", className="card-header-green"),
-            dbc.CardBody(html.Div([mail_header] + mail_rows))
-        ])
-        mail_log_section = html.Div(mail_log_cards, className="scrollable-card fixed-card-height")
+        # Mail geçmişi kartı
+        mail_log_section = html.Div(
+            dbc.Card(
+                html.Div([
+                    # Başlık direkt kart içerisinde
+                    html.H5("📬 Gönderilen Mail Geçmişi", className="card-title", style={
+                        "marginBottom": "15px", "color": "white", "fontWeight": "bold"
+                    }),
+                    
+                    # Mail tablosu
+                    html.Div([mail_header] + mail_rows)
+                ], style={"padding": "15px"}),
+                style={
+                    "height": "100%",
+                    "backgroundColor": "var(--card-bg-dark)"
+                }
+            ),
+            className="scrollable-card fixed-card-height"
+        )
     else:
-        mail_log_section = html.Div([
-            dbc.Card([
-                dbc.CardHeader("📬 Gönderilen Mail Geçmişi", className="card-header-green"),
-                dbc.CardBody([
+        mail_log_section = html.Div(
+            dbc.Card(
+                html.Div([
+                    # Başlık direkt kart içerisinde
+                    html.H5("📬 Gönderilen Mail Geçmişi", className="card-title", style={
+                        "marginBottom": "15px", "color": "white", "fontWeight": "bold"
+                    }),
+                    
                     html.P("Bu alana sadece kendi profilinizden erişebilirsiniz.", style={"color": "#AAAAAA"})
-                ])
-            ])
-        ], className="scrollable-card fixed-card-height")
-
+                ], style={"padding": "15px"}),
+                style={
+                    "height": "100%",
+                    "backgroundColor": "var(--card-bg-dark)"
+                }
+            ),
+            className="scrollable-card fixed-card-height"
+        )
 
     return user_info, user_analyses, pdf_list_section, mail_log_section
 
@@ -406,5 +450,3 @@ def send_quick_mail(_, file_info, recipient, body):
 )
 def close_modal(n):
     return False
-
-
