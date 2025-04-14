@@ -1,4 +1,4 @@
-from dash import html, dcc, Input, Output, State, callback
+from dash import html, dcc, Input, Output, State, callback, callback_context
 from utils.user_context import get_current_user
 import datetime
 from database.mongo_operations import (
@@ -15,71 +15,100 @@ if not is_admin(current_user):
 else:
     layout = html.Div([
         dcc.Location(id="admin-url", refresh=False),
-
-        html.H2("🛠️ Yönetim Paneli", style={
-            "text-align": "center",
-            "margin-bottom": "30px",
-            "color": "#FFD700"
-        }),
-
-        html.H4("👑 Yetkili Adminler:", style={"margin-bottom": "10px"}),
-
-        html.Ul(
-            id="admin-list-display",
-            style={"list-style-type": "circle", "margin-left": "20px"}
-        ),
-
-        html.Hr(style={"margin": "30px 0"}),
-
+        
+        # Özel İşlem butonu sağ üstte
         html.Div([
+            html.Button("🛠️ Özel İşlem Başlat", 
+                    id="custom-admin-btn", 
+                    n_clicks=0,
+                    className="admin-btn-success",
+                    style={"padding": "8px 20px"})
+        ], style={"display": "flex", "justify-content": "flex-end", "margin-bottom": "25px"}),
 
-            html.Div([
-                html.H4("➕ Yeni Admin Ekle", style={"margin-bottom": "10px"}),
-
-                dcc.Dropdown(
-                    id="new-admin-dropdown",
-                    placeholder="Bir kullanıcı seçin...",
-                    style={"width": "100%", "color": "#000000"}
-                ),
-
-                html.Button("Admin Olarak Ekle", id="add-admin-btn", n_clicks=0,
-                            className="btn btn-success", style={"margin-top": "10px"}),
-
-                html.Div(id="add-admin-feedback", style={"margin-top": "15px", "color": "#00FF00"})
-            ], style={"flex": "1", "margin-right": "30px"}),
-
-            html.Div([
-                html.H4("❌ Admin Sil", style={"margin-bottom": "10px"}),
-
-                dcc.Dropdown(
-                    id="admin-remove-dropdown",
-                    placeholder="Admin seçin...",
-                    style={"width": "100%", "color": "#000000", "margin-bottom": "10px"}
-                ),
-
-                html.Button("Adminliği Kaldır", id="remove-admin-btn", n_clicks=0,
-                            className="btn btn-danger"),
-
-                html.Div(id="remove-admin-feedback", style={"margin-top": "15px", "color": "#FF4444"})
-            ], style={"flex": "1"})
-
-        ], style={"display": "flex", "gap": "20px", "margin-top": "30px", "flex-wrap": "wrap"}),
-
-        # 🔽 Yeni eklenen mail log alanı
-        html.Hr(style={"margin": "40px 0"}),
-        html.Div(id="mail-log-section", style={"margin-top": "30px"}),
-
-        html.Hr(style={"margin": "40px 0"}),
-
+        # Admin ve Kullanıcı Yönetimi Satırı
         html.Div([
-            html.H4("👥 Kayıtlı Kullanıcılar", style={"margin-bottom": "10px"}),
-            html.Ul(id="user-list-display", style={"margin-left": "20px"})
-        ])
+            # Sol Sütun
+            html.Div([
+                # Admin Listesi Kartı
+                html.Div([
+                    html.Div([
+                        html.H5("👑 Yetkili Adminler", className="admin-title"),
+                        html.Div([
+                            html.Ul(
+                                id="admin-list-display",
+                                className="admin-list"
+                            )
+                        ], className="card-content-scroll")
+                    ], style={"padding": "15px"})
+                ], className="admin-card fixed-height-card"),
+                
+                # Kullanıcı Listesi Kartı
+                html.Div([
+                    html.Div([
+                        html.H5("👥 Kayıtlı Kullanıcılar", className="admin-title"),
+                        html.Div([
+                            html.Ul(id="user-list-display", className="admin-list")
+                        ], className="card-content-scroll")
+                    ], style={"padding": "15px"})
+                ], className="admin-card fixed-height-card")
+            ], className="admin-column"),
+            
+            # Sağ Sütun
+            html.Div([
+                # Yeni Admin Ekleme Kartı
+                html.Div([
+                    html.Div([
+                        html.H5("➕ Yeni Admin Ekle", className="admin-title"),
+                        html.Div([
+                            dcc.Dropdown(
+                                id="new-admin-dropdown",
+                                placeholder="Bir kullanıcı seçin...",
+                                style={"color": "#000000", "margin-bottom": "15px"}
+                            ),
+                            html.Button("Admin Olarak Ekle", 
+                                        id="add-admin-btn", 
+                                        n_clicks=0,
+                                        className="admin-btn-success")
+                        ], className="admin-form-group"),
+                        html.Div(id="add-admin-feedback", 
+                                 style={"margin-top": "15px", "color": "#00FF00"})
+                    ], style={"padding": "15px"})
+                ], className="admin-card fixed-height-card"),
+                
+                # Admin Silme Kartı
+                html.Div([
+                    html.Div([
+                        html.H5("❌ Admin Sil", className="admin-title"),
+                        html.Div([
+                            dcc.Dropdown(
+                                id="admin-remove-dropdown",
+                                placeholder="Admin seçin...",
+                                style={"color": "#000000", "margin-bottom": "15px"}
+                            ),
+                            html.Button("Adminliği Kaldır", 
+                                        id="remove-admin-btn", 
+                                        n_clicks=0,
+                                        className="admin-btn-danger")
+                        ], className="admin-form-group"),
+                        html.Div(id="remove-admin-feedback", 
+                                 style={"margin-top": "15px", "color": "#FF4444"})
+                    ], style={"padding": "15px"})
+                ], className="admin-card fixed-height-card")
+            ], className="admin-column")
+        ], className="admin-section"),
 
+        # Mail Log Kartı
+        html.Div([
+            html.Div([
+                html.H5("📬 Gönderilen Mail Kayıtları", className="admin-title"),
+                html.Div(id="mail-log-section", className="admin-scrollable", 
+                         style={"maxHeight": "400px"})
+            ], style={"padding": "15px"})
+        ], className="admin-card")
 
     ], style={
         "backgroundColor": "#1E2124",
-        "color": "#00FF00",
+        "color": "#FFF",
         "padding": "20px",
         "font-family": "Arial, sans-serif",
         "minHeight": "95vh"
@@ -172,15 +201,8 @@ def render_mail_logs(_):
             html.Td(log.get("attachment_name", "—"))
         ]))
 
-    return html.Div([
-        html.H4("📬 Gönderilen Mail Kayıtları", style={"margin-bottom": "20px"}),
-        html.Table([table_head] + table_rows, style={
-            "width": "100%",
-            "border": "1px solid #00FF00",
-            "borderCollapse": "collapse",
-            "textAlign": "left"
-        })
-    ])
+    return html.Table([html.Thead(table_head), html.Tbody(table_rows)], 
+                     className="admin-mail-table")
 
 @callback(
     Output("user-list-display", "children"),
@@ -191,7 +213,8 @@ def render_user_list(_):
     users = get_all_users()
     return [
         html.Li(
-            dcc.Link(user["_id"], href=f"/profile?user={user['_id']}", style={"color": "#00FF00"})
+            dcc.Link(user["_id"], href=f"/profile?user={user['_id']}", 
+                    style={"color": "var(--text-green)"})
         )
         for user in users
     ]

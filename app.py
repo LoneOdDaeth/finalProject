@@ -69,7 +69,7 @@ header_bar = html.Div([
 ], style={
     "width": "100%",
     "height": "100px",
-    "backgroundColor": "#1c1c1e",
+    "backgroundColor": "#1c1c1c",
     "padding": "10px 20px",
     "fontSize": "18px",
     "borderBottom": "2px solid #2ecc71",
