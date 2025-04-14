@@ -21,42 +21,65 @@ app = dash.Dash(
 server = app.server
 
 # Sidebar (Yana alınmış menü)
-sidebar = html.Div([
-    html.H3("🧠 Erlik", style={"color": "#00FF00", "margin-bottom": "30px"}),
+sidebar = dbc.NavbarSimple([
+    html.Div([
+        html.H2("🧠 Erlik", style={"color": "#2ecc71", "marginBottom": "40px"}),
 
-    html.Div([  # Menü kısmı
-        dbc.Nav([
-            dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
-            dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
-            dbc.NavLink("📄 PDF & Dışa Aktar", href="/export", active="exact", className="custom-link"),
-            dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact", className="custom-link"),
-            dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
-        ], vertical=True, pills=True)
-    ]),
+        dcc.Link("👤 Profil", href="/profile", className="custom-link", id="link-profile"),
+        dcc.Link("📊 Analiz", href="/analysis", className="custom-link", id="link-analysis"),
+        dcc.Link("📄 PDF & Rapor", href="/export", className="custom-link", id="link-export"),
+        dcc.Link("⚙️ Ayarlar", href="/settings", className="custom-link", id="link-settings"),
+        dcc.Link("🛠️ Admin Paneli", href="/admin", className="custom-link", id="link-admin"),
 
-    html.Div([  # Çıkış kısmı
-        dbc.NavLink("🚪 Çıkış", href="/logout", active="exact", className="custom-link logout-link"),
-    ], style={"margin-top": "auto"})  # otomatik alta yasla
+        html.Div([
+            dcc.Link("📜 Çıkış", href="/logout", className="custom-link logout-link")
+        ], style={"marginTop": "auto"})
+    ], className="sidebar-container")
+], color="dark", dark=True)
+
+# Header bileşeni
+header_bar = html.Div([
+    html.Div(id="current-page-title", style={
+        "color": "#FFFFFF",
+        "fontSize": "30px",
+        "fontWeight": "bold",
+        "marginRight": "auto"
+    }),
+    html.A("🧠 Erlik", style={
+        "color": "#00FF00",
+        "textDecoration": "none",
+        "fontWeight": "bold",
+        "fontSize": "20px",
+        "marginLeft": "20px"
+    })
 ], style={
-    "width": "250px",
-    "backgroundColor": "#1c1c1c",
-    "padding": "20px",
-    "height": "100vh",
+    "width": "100%",
+    "height": "100px",
+    "backgroundColor": "#1c1c24",
+    "padding": "10px 20px",
+    "fontSize": "18px",
+    "borderBottom": "2px solid #2ecc71",
     "display": "flex",
-    "flexDirection": "column",
+    "alignItems": "center",
     "justifyContent": "space-between"
 })
 
 
-# Sayfa İçeriği
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
     html.Div([sidebar], style={"width": "250px"}),
-    html.Div(id="page-content", style={"flex": 1, "padding": "20px"})
+    html.Div([
+        header_bar,  # Her sayfanın üstünde sabit header
+        html.Div(id="page-content", style={"flex": 1, "padding": "20px"})
+    ], style={
+        "flex": 1,
+        "display": "flex",
+        "flexDirection": "column"
+    })
 ], style={
     "display": "flex",
-    "height": "100vh",
-    "backgroundColor": "#000000"
+    "minHeight": "100vh",
+    "backgroundColor": "#1E2124",
 })
 
 # Sayfa Yönlendirme Callback
@@ -95,7 +118,7 @@ def display_page(pathname):
                 "color": "#FFFFFF"
             })
         ], style={
-            "backgroundColor": "#000000",
+            "backgroundColor": "#1E2124",
             "height": "100vh",
             "display": "flex",
             "flexDirection": "column",
@@ -105,8 +128,22 @@ def display_page(pathname):
         })
     else:
         return profile.layout
+    
+@app.callback(
+    Output("current-page-title", "children"),
+    Input("url", "pathname")
+)
+def update_header(pathname):
+    page_names = {
+        "/profile": "Profil Sayfası",
+        "/analysis": "Analiz Sayfası",
+        "/export": "PDF & Rapor Sayfası",
+        "/settings": "Ayarlar",
+        "/admin": "Admin Paneli",
+    }
+    return f"{page_names.get(pathname, 'Profil Sayfası')}"
 
 # Uygulamayı Başlat
 if __name__ == "__main__":
     threading.Timer(1.5, open_browser).start()
-    app.run(debug=True, port=8050)
+    app.run(debug=False, port=8050)

@@ -16,7 +16,13 @@ layout = html.Div([
     html.Button("📄 PDF Oluştur", id="generate-pdf-btn", className="btn btn-success", style={"margin-top": "10px"}),
 
     html.Div(id="export-output", style={"margin-top": "30px"})
-], style={"backgroundColor": "#000000", "color": "#00FF00", "padding": "20px", "font-family": "Arial, sans-serif"})
+], style={
+    "backgroundColor": "#1E2124",
+    "color": "#00FF00",
+    "padding": "20px",
+    "font-family": "Arial, sans-serif",
+    "minHeight": "95vh"  
+})
 
 
 @callback(

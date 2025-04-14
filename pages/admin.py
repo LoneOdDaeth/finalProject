@@ -11,7 +11,7 @@ if not is_admin(current_user):
     layout = html.Div([
         html.H2("❌ Yetkisiz Erişim", style={"color": "red", "text-align": "center"}),
         html.P("Bu sayfayı görüntülemek için admin olmalısınız.", style={"text-align": "center"})
-    ], style={"backgroundColor": "#000", "color": "#FFF", "padding": "50px"})
+    ], style={"backgroundColor": "#1E2124", "color": "#FFF", "padding": "50px", "minHeight": "95vh"})
 else:
     layout = html.Div([
         dcc.Location(id="admin-url", refresh=False),
@@ -67,13 +67,22 @@ else:
 
         # 🔽 Yeni eklenen mail log alanı
         html.Hr(style={"margin": "40px 0"}),
-        html.Div(id="mail-log-section", style={"margin-top": "30px"})
+        html.Div(id="mail-log-section", style={"margin-top": "30px"}),
+
+        html.Hr(style={"margin": "40px 0"}),
+
+        html.Div([
+            html.H4("👥 Kayıtlı Kullanıcılar", style={"margin-bottom": "10px"}),
+            html.Ul(id="user-list-display", style={"margin-left": "20px"})
+        ])
+
 
     ], style={
-        "backgroundColor": "#000000",
+        "backgroundColor": "#1E2124",
         "color": "#00FF00",
         "padding": "20px",
-        "font-family": "Arial, sans-serif"
+        "font-family": "Arial, sans-serif",
+        "minHeight": "95vh"
     })
 
 @callback(
@@ -172,3 +181,17 @@ def render_mail_logs(_):
             "textAlign": "left"
         })
     ])
+
+@callback(
+    Output("user-list-display", "children"),
+    Input("admin-url", "pathname"),
+    prevent_initial_call=False
+)
+def render_user_list(_):
+    users = get_all_users()
+    return [
+        html.Li(
+            dcc.Link(user["_id"], href=f"/profile?user={user['_id']}", style={"color": "#00FF00"})
+        )
+        for user in users
+    ]

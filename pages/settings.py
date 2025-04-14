@@ -16,7 +16,13 @@ else:
         dcc.Store(id="password-visible", data=False),  # 👁️ durumu sakla
 
         html.Div(id="settings-content")
-    ], style={"backgroundColor": "#000000", "color": "#00FF00", "padding": "20px", "font-family": "Arial, sans-serif"})
+    ], style={
+    "backgroundColor": "#1E2124",
+    "color": "#00FF00",
+    "padding": "20px",
+    "font-family": "Arial, sans-serif",
+    "minHeight": "95vh"  
+    })
 
 
     @callback(

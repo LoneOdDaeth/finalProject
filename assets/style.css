@@ -1,35 +1,159 @@
-/* Genel link stili */
+:root {
+  --bg-black: #1c1c24;
+  --text-green: #2ecc71;
+  --text-gray: #CCCCCC;
+  --text-main: #E0E0E0;
+  --card-bg-dark: #333030;
+  --card-border: #2ecc71;
+  --card-header-green: #23C175;
+  --btn-red: #e74c3c;
+  --btn-green: #2ecc71;
+  --scrollbar-track: #1a1a1a;
+  --scrollbar-thumb: #2ecc71;
+}
+
+body {
+  background-color: #1a1b1f !important;
+  color: var(--text-main);
+  font-family: Arial, sans-serif;
+}
+
+/* Kartlar */
+.profile-card {
+  border: none;
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
+  padding: 20px;
+  background-color: var(--card-bg-dark);
+  margin-bottom: 20px;
+  flex: 1;
+  min-width: 300px;
+  color: var(--text-main);
+}
+
+/* Kart başlıkları */
+.card-header-green {
+  background-color: transparent !important;
+  border: none;
+  color: white !important;
+  font-weight: bold;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+/* Scrollable */
+.scrollable-card {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.scrollable-card::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollable-card::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.scrollable-card::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+/* Sabit kart yüksekliği */
+.fixed-card-height {
+  max-height: 280px;
+  height: 280px;
+  overflow-y: auto;
+  padding-right: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.fixed-card-height::-webkit-scrollbar {
+  width: 8px;
+}
+.fixed-card-height::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+.fixed-card-height::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+/* Diğer stiller */
+.stat-box {
+  background-color: #1a1818;
+  border: 1px solid var(--text-green);
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--text-main);
+}
+
+.mail-log-header {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--text-gray);
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 40% 35% 25%;
+}
+.mail-log-row {
+  font-size: 14px;
+  color: var(--text-main);
+  display: grid;
+  grid-template-columns: 40% 35% 25%;
+  padding: 6px 0;
+  border-bottom: 1px solid #333;
+}
+
+/* Sidebar görünümü */
+.sidebar-container {
+  background-color: var(--bg-black);
+  padding: 20px;
+  height: 100vh;
+  width: 250px;
+  border-right: 2px solid var(--card-border);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Menü linkleri */
 .custom-link {
-    font-size: 18px;
-    color: #CCCCCC;
-    font-weight: normal;
-    padding: 12px 20px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    display: block;
-    text-decoration: none;
-    transition: all 0.2s ease;
+  font-size: 16px;
+  color: var(--text-main);
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: block;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* Üzerine gelindiğinde hafif parlaklık */
 .custom-link:hover {
-    background-color: #2a2a2a;
-    color: #EEEEEE;
+  background-color: #2a2a2a;
+  color: var(--text-green);
 }
 
-/* Aktif (seçili) sayfa linki */
 .custom-link.active {
-    color: #00FF00 !important;
-    background-color: #333333 !important;
-    font-weight: bold;
+  color: var(--text-green) !important;
+  background-color: #333333 !important;
+  font-weight: bold;
+  border-left: 4px solid var(--text-green);
 }
 
-/* Çıkış için özel görünüm */
+/* Çıkış linki */
 .custom-link.logout-link {
-    color: #FF4444;
+  color: var(--btn-red);
 }
 
 .custom-link.logout-link.active {
-    color: #FF8888 !important;
-    background-color: #330000 !important;
+  color: #FF8888 !important;
+  background-color: #330000 !important;
 }

@@ -33,10 +33,11 @@ layout = html.Div([
 
     html.Div(id="analysis-output", style={"margin-top": "30px"})
 ], style={
-    "backgroundColor": "#000000",
+    "backgroundColor": "#1E2124",
     "color": "#00FF00",
     "padding": "20px",
-    "font-family": "Arial, sans-serif"
+    "font-family": "Arial, sans-serif",
+    "minHeight": "95vh"  
 })
 
 

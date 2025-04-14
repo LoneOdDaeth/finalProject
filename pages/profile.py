@@ -7,6 +7,7 @@ from utils.mail_sender import send_mail
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
 import dash_bootstrap_components as dbc
+from datetime import datetime
 
 username = get_current_user()
 json_dir = "tmp/json"
@@ -14,18 +15,19 @@ json_dir = "tmp/json"
 layout = html.Div([
     dcc.Location(id="page-url", refresh=False),
 
-    html.H2("Kullanıcı Profili", style={"text-align": "center", "color": "#00FF00"}),
+    html.Div([
+        html.Div([  # Sol Sütun (daha dar)
+            html.Div(id="user-info", className="profile-card user-info", style={"margin-bottom": "20px"}),
+            html.Div(id="user-analyses", className="profile-card")
+        ], style={"flex": "0.6", "minWidth": "280px"}),
 
-    html.Div(id="user-info", style={"margin-bottom": "20px"}),
-
-    html.Div(id="user-analyses"),
-
-    html.Div(id="user-list-section", style={"margin-top": "40px"}),
-
-    html.Div(id="pdf-history-section", style={"margin-top": "40px"}),
+        html.Div([  # Sağ Sütun (biraz daha geniş)
+            html.Div(id="user-mail-log-section", className="profile-card", style={"margin-bottom": "20px", "overflowY": "auto", "maxHeight": "300px", "minHeight": "327px"}),
+            html.Div(id="pdf-history-section", className="profile-card")
+        ], style={"flex": "1.4", "minWidth": "380px"})
+    ], className="profile-columns", style={"display": "flex", "gap": "20px"}),
 
     html.Div(id="pdf-open-feedback", style={"margin-top": "20px", "color": "red"}),
-
     html.Div(id="delete-feedback", style={"margin-top": "20px", "color": "red"}),
 
     dbc.Modal([
@@ -44,24 +46,23 @@ layout = html.Div([
         ])
     ], id="quick-mail-modal", is_open=False)
 ], style={
-    "backgroundColor": "#000000",
+    "backgroundColor": "#1E2124",
     "color": "#00FF00",
     "padding": "20px",
-    "font-family": "Arial, sans-serif"
+    "font-family": "Arial, sans-serif",
+    "minHeight": "95vh"  
 })
-
 
 @callback(
     Output("user-info", "children"),
     Output("user-analyses", "children"),
-    Output("user-list-section", "children"),
     Output("pdf-history-section", "children"),
+    Output("user-mail-log-section", "children"),
     Input("page-url", "search"),
     prevent_initial_call=False
 )
 def render_profile(search):
     current_user = get_current_user()
-
     if not current_user:
         return html.Div("🔐 Giriş yapılmamış.", style={"color": "red"}), "", "", ""
 
@@ -76,75 +77,229 @@ def render_profile(search):
         return html.Div("❌ Bu sayfaya erişim izniniz yok.", style={"color": "red"}), "", "", ""
 
     user_analyses = get_user_analyses(selected_user)
-
-    yetki = "Yönetici" if is_admin(selected_user) else "Kullanıcı"
-    user_info = html.Div([
-        html.P(f"👤 Kullanıcı (E-posta): {selected_user}", style={"font-size": "18px"}),
-        html.P(f"🔰 Yetki: {yetki}")
-    ])
-
-    analysis_list = html.Ul([
-        html.Li([
-            html.Span(f"{a['filename']} – {a['timestamp']}"),
-            html.Button("❌ Sil", id={"type": "delete-btn", "index": a['filename']}, n_clicks=0,
-                        style={"margin-left": "10px", "color": "white", "background-color": "#ff4444"})
-        ]) if selected_user == current_user or is_admin(current_user) else
-        html.Li([
-            html.Span(f"{a['filename']} – {a['timestamp']}")
-        ])
-        for a in user_analyses
-    ]) if user_analyses else html.P("Bu kullanıcı için analiz bulunamadı.")
-
-
-    all_users = get_all_users()
-    user_links = html.Ul([
-        html.Li(dcc.Link(
-            user["_id"],
-            href=f"/profile?user={user['_id']}"
-        )) for user in all_users if user["_id"] != current_user
-    ])
-
-    user_list_section = html.Div([
-        html.H4("👥 Kullanıcı Listesi:"),
-        user_links
-    ]) if is_admin(current_user) else html.Div()
-
     user_pdfs = get_user_pdfs(selected_user)
+    mail_logs = get_all_mail_logs()
+    mail_count = sum(1 for log in mail_logs if log["sender"] == selected_user)
+    yetki = "Yönetici" if is_admin(selected_user) else "Kullanıcı"
 
-    pdf_list = html.Ul([
-        html.Li([
-            html.A(
-                f"{pdf['pdf_filename']} – {pdf['timestamp']}",
-                href=f"file://{pdf['path']}",
-                target="_blank"
-            ),
-            html.Button("❌ Sil", id={"type": "delete-pdf-btn", "index": pdf["pdf_filename"]}, n_clicks=0,
-                        style={"margin-left": "10px", "color": "white", "background-color": "#ff4444"}),
-            html.Button("📧 Mail At", id={"type": "open-mail-modal", "filename": pdf['pdf_filename'], "filetype": "pdf"},
-                        n_clicks=0, style={"margin-left": "10px"})
-        ]) if selected_user == current_user or is_admin(current_user) else
-        html.Li([
-            html.A(
-                f"{pdf['pdf_filename']} – {pdf['timestamp']}",
-                href=f"file://{pdf['path']}",
-                target="_blank"
+    # Kullanıcı Bilgileri
+    user_info = html.Div([
+        dbc.Card([
+            dbc.CardHeader("Kullanıcı Bilgileri", className="card-header-green"),
+            dbc.CardBody(
+                html.Div([
+
+                    # Kullanıcı mail ve yetki bilgisi
+                    html.Div([
+                        html.P(f"Mail: {selected_user}", style={
+                            "font-size": "16px", "margin": "0", "font-weight": "bold"
+                        }),
+                        html.P(f"Yetki: {yetki}", style={
+                            "font-size": "16px", "margin": "0", "font-weight": "bold"
+                        })
+                    ], style={"marginBottom": "12px"}),
+
+                    # İki istatistik kutusu
+                    html.Div([
+
+                        # PDF Sayısı Kutusu
+                        html.Div([
+                            html.P(f"{len(user_pdfs)}", style={
+                                "margin": "0", "fontSize": "26px", "fontWeight": "bold",
+                                "color": "#fff", "textAlign": "center"
+                            }),
+                            html.Div([
+                                html.Span("📄", style={"fontSize": "18px", "marginRight": "6px"}),
+                                html.Span("PDF Sayısı", style={
+                                    "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
+                                })
+                            ], style={
+                                "display": "flex",
+                                "justifyContent": "center",
+                                "alignItems": "center",
+                                "marginTop": "8px"
+                            })
+                        ], style={
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "alignItems": "center",
+                            "padding": "12px 16px",
+                            "border": "1px solid var(--text-green)",
+                            "borderRadius": "6px",
+                            "flex": "1",
+                            "height": "140px",
+                            "boxSizing": "border-box"
+                        }),
+
+                        # Mail Sayısı Kutusu
+                        html.Div([
+                            html.P(f"{mail_count}", style={
+                                "margin": "0", "fontSize": "26px", "fontWeight": "bold",
+                                "color": "#fff", "textAlign": "center"
+                            }),
+                            html.Div([
+                                html.Span("📧", style={"fontSize": "18px", "marginRight": "6px"}),
+                                html.Span("Mail Sayısı", style={
+                                    "fontSize": "13px", "color": "#ccc", "fontWeight": "bold"
+                                })
+                            ], style={
+                                "display": "flex",
+                                "justifyContent": "center",
+                                "alignItems": "center",
+                                "marginTop": "8px"
+                            })
+                        ], style={
+                            "display": "flex",
+                            "flexDirection": "column",
+                            "justifyContent": "center",
+                            "alignItems": "center",
+                            "padding": "12px 16px",
+                            "border": "1px solid var(--text-green)",
+                            "borderRadius": "6px",
+                            "flex": "1",
+                            "height": "140px",
+                            "boxSizing": "border-box"
+                        })
+
+                    ], style={
+                        "display": "flex",
+                        "gap": "12px",
+                        "marginTop": "10px"
+                    })
+
+                ], style={
+                    "display": "flex",
+                    "flexDirection": "column",
+                    "justifyContent": "space-between",
+                    "flexGrow": "1",
+                    "height": "100%"
+                }),
+                style={
+                    "height": "100%",
+                    "display": "flex",
+                    "flexDirection": "column"
+                }
             )
-        ])
+        ], style={
+            "height": "100%",
+            "display": "flex",
+            "flexDirection": "column"
+        })
+    ])
+
+    # Analizler
+    analysis_items = [
+        html.Div([
+            html.Div([
+                html.P(f"📁 {a['filename']}", style={"margin": "0", "color": "white", "font-weight": "bold"}),
+                html.P(f"🕒 {datetime.fromisoformat(a['timestamp']).strftime('%d.%m.%Y %H:%M')}",
+                    style={"font-size": "12px", "color": "#AAAAAA"})
+            ], style={"flex": "1"}),
+
+            html.Div([
+                html.Button("❌ Sil", id={"type": "delete-btn", "index": a["filename"]}, n_clicks=0,
+                            style={"color": "white", "background-color": "#ff4444"})
+            ], className="card-button-group")
+        ], style={
+            "display": "flex",
+            "justifyContent": "space-between",
+            "alignItems": "center",
+            "padding": "12px 0",
+            "borderBottom": "1px solid white"  # ← çizgi burada
+        })
+        for a in user_analyses
+    ] if user_analyses else [html.P("Bu kullanıcı için analiz bulunamadı.", style={"color": "#AAAAAA"})]
+
+
+    analysis_cards = dbc.Card([
+        dbc.CardHeader("📊 Son Analizler", className="card-header-green"),
+        dbc.CardBody(html.Div(analysis_items))
+    ])
+    user_analyses = html.Div(analysis_cards, className="scrollable-card fixed-card-height")
+
+    # PDF Raporları
+    pdf_items = [
+        html.Div([
+            html.Div([
+                html.P(f"📄 {pdf['pdf_filename']}", style={
+                    "margin": "0", "color": "white", "font-weight": "bold"
+                }),
+                html.P(f"🕒 {datetime.fromisoformat(pdf['timestamp']).strftime('%d.%m.%Y %H:%M')}",
+                    style={"font-size": "12px", "color": "#AAAAAA"})
+            ], style={"flex": "1"}),
+
+            html.Div([
+                html.Button("📧 Mail At", id={
+                    "type": "open-mail-modal",
+                    "filename": pdf['pdf_filename'],
+                    "filetype": "pdf"
+                }, n_clicks=0, className="btn btn-success", style={"margin-bottom": "5px"}),
+
+                html.Button("❌ Sil", id={
+                    "type": "delete-pdf-btn",
+                    "index": pdf["pdf_filename"]
+                }, n_clicks=0, style={"color": "white", "background-color": "#ff4444"})
+            ], className="card-button-group")
+        ], style={
+            "display": "flex",
+            "justifyContent": "space-between",
+            "alignItems": "center",
+            "padding": "12px 0",
+            "borderBottom": "1px solid white"
+        })
         for pdf in user_pdfs
-    ]) if user_pdfs else html.P("Bu kullanıcıya ait PDF raporu bulunamadı.")
+    ] if user_pdfs else [html.P("Bu kullanıcıya ait PDF raporu bulunamadı.", style={"color": "#AAAAAA"})]
 
-    pdf_list_section = html.Div([
-        html.H4("📄 PDF Rapor Geçmişi:"),
-        pdf_list
-    ], style={"margin-top": "40px"})
 
-    admin_link = html.Div(
-        dcc.Link("🚰 Yönetim Paneline Git", href="/admin"),
-        style={"margin-top": "40px", "text-align": "center"}
-    ) if is_admin(selected_user) else html.Div()
+    pdf_cards = dbc.Card([
+        dbc.CardHeader("📄 PDF Rapor Geçmişi", className="card-header-green"),
+        dbc.CardBody(html.Div(pdf_items))
+    ])
+    pdf_list_section = html.Div(pdf_cards, className="scrollable-card fixed-card-height")
 
-    return user_info, analysis_list, user_list_section, html.Div([pdf_list_section, admin_link])
+    # Mail Log
+    if selected_user == current_user:
+        user_mail_logs = [log for log in mail_logs if log["sender"] == current_user]
 
+        mail_header = html.Div([
+            html.Span("📎 Dosya", style={"font-weight": "bold"}),
+            html.Span("👤 Alıcı", style={"font-weight": "bold"}),
+            html.Span("🕒 Tarih", style={"font-weight": "bold"})
+        ], className="mail-log-header")
+
+        mail_rows = [
+            html.Div([
+                html.Span(f"📎 {log['attachment_name'] or 'Dosya yok'}", style={"color": "white", "font-weight": "bold"}),
+                html.Span(f"👤 {log['recipient']}", style={"color": "white", "font-weight": "bold"}),
+                html.Span(f"🕒 {datetime.fromisoformat(log['timestamp']).strftime('%d.%m.%Y %H:%M')}", style={"color": "white", "font-weight": "bold"})
+            ], className="mail-log-row")
+            for log in user_mail_logs
+        ] if user_mail_logs else [
+            html.Div([
+                html.Span("Veri bulunamadı."),
+                html.Span("-"),
+                html.Span("-")
+            ], className="mail-log-row")
+        ]
+
+        mail_log_cards = dbc.Card([
+            dbc.CardHeader("📬 Gönderilen Mail Geçmişi", className="card-header-green"),
+            dbc.CardBody(html.Div([mail_header] + mail_rows))
+        ])
+        mail_log_section = html.Div(mail_log_cards, className="scrollable-card fixed-card-height")
+    else:
+        mail_log_section = html.Div([
+            dbc.Card([
+                dbc.CardHeader("📬 Gönderilen Mail Geçmişi", className="card-header-green"),
+                dbc.CardBody([
+                    html.P("Bu alana sadece kendi profilinizden erişebilirsiniz.", style={"color": "#AAAAAA"})
+                ])
+            ])
+        ], className="scrollable-card fixed-card-height")
+
+
+    return user_info, user_analyses, pdf_list_section, mail_log_section
 
 @callback(
     Output("delete-feedback", "children"),
@@ -168,7 +323,6 @@ def delete_analysis(n_clicks_list, ids):
         os.remove(json_path)
 
     return f"🗑️ '{filename}' adlı analiz başarıyla silindi. Sayfayı yenileyin."
-
 
 @callback(
     Output("pdf-open-feedback", "children"),
@@ -206,7 +360,6 @@ def open_quick_mail_modal(n_clicks_list):
     if not triggered:
         raise PreventUpdate
 
-    # Sadece bir buton tıklandığında aç
     if all(n == 0 or n is None for n in n_clicks_list):
         raise PreventUpdate
 
@@ -246,7 +399,6 @@ def send_quick_mail(_, file_info, recipient, body):
     success, msg = send_mail(sender, recipient, subject, body, attachments=[filepath])
     return msg
 
-
 @callback(
     Output("quick-mail-modal", "is_open", allow_duplicate=True),
     Input("cancel-quick-mail", "n_clicks"),
@@ -254,3 +406,5 @@ def send_quick_mail(_, file_info, recipient, body):
 )
 def close_modal(n):
     return False
+
+
