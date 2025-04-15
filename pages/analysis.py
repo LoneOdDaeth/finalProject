@@ -11,15 +11,11 @@ from pathlib import Path
 from pcap_processing.pcap_parser import analyze_pcap
 import dash_bootstrap_components as dbc
 
+# Layout değişikliği (mevcut layout'unuzun yerine aşağıdaki düzeni kullanabilirsiniz)
 layout = html.Div([
     # Header section with file upload and controls
     html.Div([
         html.Div([
-            html.H3("Network Traffic Analysis", style={
-                "color": "white", 
-                "fontWeight": "bold",
-                "marginBottom": "20px"
-            }),
             html.Div([
                 dcc.Upload(
                     id="upload-pcap",
@@ -50,58 +46,38 @@ layout = html.Div([
         ], style={"width": "50%", "marginBottom": "30px"}),
     ], style={"padding": "20px 0"}),
     
-    # Top row - KPI cards
+    # Yeni yerleşim planı
+    # İlk satır - Analiz Özeti ve En Yoğun Trafik Üreten IP'ler
     html.Div([
-        # Analiz özeti kartı
+        # Sol taraf - Analiz Özeti Kartı
         dbc.Card([
             html.Div([
-                html.H5("📊 Analiz Özeti", 
+                html.H5("Analiz Özeti", 
                        className="card-title", 
                        style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
                 html.Div(id="analysis-summary-content", className="card-content-scroll")
             ], style={"padding": "15px"})
-        ], id="info-card", className="dashboard-card", 
+        ], className="dashboard-card", 
            style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
         
-        # Toplam Paket kartı
+        # Sağ taraf - En Yoğun Trafik Üreten IP'ler
         dbc.Card([
             html.Div([
-                html.H5("📦 Toplam Paket", 
+                html.H5("En Yoğun Trafik Üreten IP'ler", 
                        className="card-title", 
                        style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
-                html.Div(id="total-packets", 
-                        style={"fontSize": "36px", "fontWeight": "bold", "color": "var(--text-green)", "textAlign": "center"})
+                html.Div(id="top-talkers-chart")
             ], style={"padding": "15px"})
         ], className="dashboard-card", 
-           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "200px"}),
-        
-        # Unique IP'ler kartı
-        dbc.Card([
-            html.Div([
-                html.H5("🌐 Benzersiz IP'ler", 
-                       className="card-title", 
-                       style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
-                html.Div([
-                    html.Div([
-                        html.Span("Kaynak: ", style={"color": "var(--text-gray)"}),
-                        html.Span(id="unique-src-count", style={"color": "var(--text-green)", "fontWeight": "bold"})
-                    ], style={"marginBottom": "10px", "fontSize": "18px"}),
-                    html.Div([  # Burada `html.div` yerine `html.Div` olarak düzeltildi
-                        html.Span("Hedef: ", style={"color": "var(--text-gray)"}),
-                        html.Span(id="unique-dst-count", style={"color": "var(--text-green)", "fontWeight": "bold"})
-                    ], style={"fontSize": "18px"})
-                ], style={"textAlign": "center"})
-            ], style={"padding": "15px"})
-        ], className="dashboard-card", 
-           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "200px"}),
+           style={"backgroundColor": "var(--card-bg-dark)", "flex": "3", "minWidth": "400px"}),
     ], style={"display": "flex", "gap": "20px", "marginBottom": "20px", "flexWrap": "wrap"}),
     
-    # Middle row - Main charts
+    # İkinci satır - Protokol Dağılımı kartları
     html.Div([
-        # Sol sütun - Protocol Pie Chart
+        # Sol taraf - Protokol Dağılımı (pie chart)
         dbc.Card([
             html.Div([
-                html.H5("🥧 Protokol Dağılımı", 
+                html.H5("Protokol Dağılımı", 
                        className="card-title", 
                        style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
                 html.Div(id="protocol-pie-chart")
@@ -109,21 +85,10 @@ layout = html.Div([
         ], className="dashboard-card", 
            style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
         
-        # Orta sütun - Top talkers
+        # Sağ taraf - Protokol Paket Dağılımı (bar chart)
         dbc.Card([
             html.Div([
-                html.H5("🔝 En Yoğun Trafik Üreten IP'ler", 
-                       className="card-title", 
-                       style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
-                html.Div(id="top-talkers-chart")
-            ], style={"padding": "15px"})
-        ], className="dashboard-card", 
-           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "400px"}),
-        
-        # Sağ sütun - Protocol bar chart
-        dbc.Card([
-            html.Div([
-                html.H5("📊 Protokol Paket Dağılımı", 
+                html.H5("Protokol Paket Dağılımı", 
                        className="card-title", 
                        style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
                 html.Div(id="protocol-bar-chart")
@@ -132,47 +97,51 @@ layout = html.Div([
            style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
     ], style={"display": "flex", "gap": "20px", "marginBottom": "20px", "flexWrap": "wrap"}),
     
-    # Bottom row - IP distributions and time series
+    # Üçüncü satır - IP dağılımları
     html.Div([
-        # IP dağılımları yan yana
-        html.Div([
-            # Source IP Card
-            dbc.Card([
-                html.Div([
-                    html.H5("📤 Kaynak IP Dağılımı", 
-                           className="card-title", 
-                           style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
-                    html.Div(id="source-ip-chart")
-                ], style={"padding": "15px"})
-            ], className="dashboard-card", 
-               style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
-            
-            # Destination IP Card
-            dbc.Card([
-                html.Div([
-                    html.H5("📥 Hedef IP Dağılımı", 
-                           className="card-title", 
-                           style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
-                    html.Div(id="dest-ip-chart")
-                ], style={"padding": "15px"})
-            ], className="dashboard-card", 
-               style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
-        ], style={"display": "flex", "gap": "20px", "marginBottom": "20px", "flexWrap": "wrap", "flex": "2"}),
-        
-        # Zaman serisi kartı
+        # Sol taraf - Kaynak IP Dağılımı
         dbc.Card([
             html.Div([
-                html.H5("⏱️ Zamana Göre Paket Yoğunluğu", 
+                html.H5("Kaynak IP Dağılımı", 
+                       className="card-title", 
+                       style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
+                html.Div(id="source-ip-chart")
+            ], style={"padding": "15px"})
+        ], className="dashboard-card", 
+           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
+        
+        # Sağ taraf - Hedef IP Dağılımı
+        dbc.Card([
+            html.Div([
+                html.H5("Hedef IP Dağılımı", 
+                       className="card-title", 
+                       style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
+                html.Div(id="dest-ip-chart")
+            ], style={"padding": "15px"})
+        ], className="dashboard-card", 
+           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
+    ], style={"display": "flex", "gap": "20px", "marginBottom": "20px", "flexWrap": "wrap"}),
+    
+    # Dördüncü satır - Zamana Göre Paket Yoğunluğu
+    html.Div([
+        dbc.Card([
+            html.Div([
+                html.H5("Zamana Göre Paket Yoğunluğu", 
                        className="card-title", 
                        style={"color": "white", "fontWeight": "bold", "marginBottom": "15px"}),
                 html.Div(id="time-series-chart")
             ], style={"padding": "15px"})
         ], className="dashboard-card", 
-           style={"backgroundColor": "var(--card-bg-dark)", "flex": "1", "minWidth": "300px"}),
-    ], style={"display": "flex", "gap": "20px", "flexWrap": "wrap"}),
+           style={"backgroundColor": "var(--card-bg-dark)", "width": "100%"}),
+    ], style={"marginBottom": "20px"}),
     
-    # Hidden storage for processed data
+    # Gizli veri depolama
     dcc.Store(id="analysis-data-store"),
+    
+    # Toplam paket ve benzersiz IP sayılarını saklamak için gizli div'ler
+    html.Div(id="total-packets", style={"display": "none"}),
+    html.Div(id="unique-src-count", style={"display": "none"}),
+    html.Div(id="unique-dst-count", style={"display": "none"}),
     
 ], style={
     "backgroundColor": "#1E2124",
@@ -281,6 +250,9 @@ def update_dashboard(data):
             html.P(f"👤 Analizi Yapan: {owner_email}", className="mb-2"),
             html.P(f"📄 Dosya: {filename}", className="mb-2"),
             html.P(f"🕒 Zaman Aralığı: {time_range_str}", className="mb-2"),
+            html.P(f"📦 Toplam Paket: {result['total_packets']}", className="mb-2"),
+            html.P(f"🔢 Benzersiz Kaynak IP: {len(result['unique_src_ips'])}", className="mb-2"),
+            html.P(f"🔢 Benzersiz Hedef IP: {len(result['unique_dst_ips'])}", className="mb-2"),
         ])
         
         # KPI values
@@ -288,7 +260,7 @@ def update_dashboard(data):
         unique_src = len(result['unique_src_ips'])
         unique_dst = len(result['unique_dst_ips'])
         
-        # Protocol pie chart
+        # Protocol pie chart - Saydam arkaplan
         protocol_data = result["protocols"]
         protocol_pie = dcc.Graph(
             figure=px.pie(
@@ -297,15 +269,15 @@ def update_dashboard(data):
                 title="",
                 color_discrete_sequence=px.colors.sequential.Viridis
             ).update_layout(
-                paper_bgcolor='#333030',
-                plot_bgcolor='#333030',
+                paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                 font=dict(color='white'),
                 margin=dict(t=10, b=10, l=10, r=10),
                 height=300
             )
         )
         
-        # Protocol bar chart
+        # Protocol bar chart - Saydam arkaplan
         protocol_bar = dcc.Graph(
             figure=px.bar(
                 x=list(protocol_data.keys()),
@@ -315,15 +287,15 @@ def update_dashboard(data):
                 color=list(protocol_data.keys()),
                 color_discrete_sequence=px.colors.qualitative.Set3
             ).update_layout(
-                paper_bgcolor='#333030',
-                plot_bgcolor='#333030',
+                paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                 font=dict(color='white'),
                 margin=dict(t=10, b=10, l=10, r=10),
                 height=300
             )
         )
         
-        # Top talkers chart
+        # Top talkers chart - Saydam arkaplan
         top_talkers = dcc.Graph(
             figure=px.bar(
                 x=list(result["src_ip_counts"].keys())[:10],
@@ -333,15 +305,15 @@ def update_dashboard(data):
                 color=list(result["src_ip_counts"].keys())[:10],
                 color_discrete_sequence=px.colors.sequential.Magma
             ).update_layout(
-                paper_bgcolor='#333030',
-                plot_bgcolor='#333030',
+                paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                 font=dict(color='white'),
                 margin=dict(t=10, b=10, l=10, r=10),
                 height=300
             )
         )
         
-        # Source IP chart
+        # Source IP chart - Saydam arkaplan
         source_ip = dcc.Graph(
             figure=px.bar(
                 x=result["unique_src_ips"][:15],
@@ -351,15 +323,15 @@ def update_dashboard(data):
                 color=result["unique_src_ips"][:15],
                 color_discrete_sequence=px.colors.qualitative.Dark24
             ).update_layout(
-                paper_bgcolor='#333030',
-                plot_bgcolor='#333030',
+                paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                 font=dict(color='white'),
                 margin=dict(t=10, b=10, l=10, r=10),
                 height=250
             )
         )
         
-        # Destination IP chart
+        # Destination IP chart - Saydam arkaplan
         dest_ip = dcc.Graph(
             figure=px.bar(
                 x=result["unique_dst_ips"][:15],
@@ -369,15 +341,15 @@ def update_dashboard(data):
                 color=result["unique_dst_ips"][:15],
                 color_discrete_sequence=px.colors.qualitative.Prism
             ).update_layout(
-                paper_bgcolor='#333030',
-                plot_bgcolor='#333030',
+                paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                 font=dict(color='white'),
                 margin=dict(t=10, b=10, l=10, r=10),
                 height=250
             )
         )
         
-        # Time series chart
+        # Time series chart - Saydam arkaplan
         timestamps = result.get("timestamps", [])
         if timestamps:
             time_series = dcc.Graph(
@@ -387,8 +359,8 @@ def update_dashboard(data):
                     title="",
                     labels={"x": "Zaman", "y": "Paket No"},
                 ).update_layout(
-                    paper_bgcolor='#333030',
-                    plot_bgcolor='#333030',
+                    paper_bgcolor='rgba(0,0,0,0)',  # Saydam arkaplan
+                    plot_bgcolor='rgba(0,0,0,0)',   # Saydam arkaplan
                     font=dict(color='white'),
                     margin=dict(t=10, b=10, l=10, r=10),
                     height=250
@@ -402,7 +374,6 @@ def update_dashboard(data):
     except Exception as e:
         error_message = html.P(f"Hata: {str(e)}", style={"color": "#FF4444"})
         return [error_message] + ["—"] * 3 + [html.P(f"Gösterim hatası: {str(e)}", style={"color": "#FF4444"})] * 6
-
 
 @callback(
     Output("upload-message", "children"),

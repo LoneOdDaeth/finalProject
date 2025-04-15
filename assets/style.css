@@ -416,3 +416,50 @@ body {
   background-color: #2a2a2a !important;
   color: var(--text-green) !important;
 }
+
+/* En Yoğun Trafik Üreten IP'ler için yeni stil - daraltılmış yükseklik */
+.top-talkers-card {
+  height: 250px !important;
+  min-height: 250px !important;
+  max-height: 250px !important;
+}
+
+/* Sağ panel için stil (mavi çerçeve içindeki alan) */
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: var(--card-bg-dark);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 12px rgba(0, 100, 255, 0.2);
+}
+
+/* Sağ paneldeki kart stilleri */
+.stats-card {
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.stats-card-title {
+  font-size: 16px;
+  color: var(--text-gray);
+}
+
+.stats-card-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--text-green);
+}
+
+/* Analiz özeti için düzeltilmiş stil */
+.summary-card {
+  overflow-y: auto !important;
+  max-height: 300px !important;
+}
