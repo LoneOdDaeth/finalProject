@@ -34,11 +34,17 @@ body {
 .card {
   border: none !important;
   background-color: transparent !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-body {
   padding: 0 !important;
   border: none !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Card içindeki diğer komponentlerdeki borderleri kaldırma */
@@ -91,9 +97,10 @@ body {
 
 /* Sabit kart yüksekliği */
 .fixed-card-height {
-  max-height: 280px;
-  height: 280px;
-  overflow-y: auto;
+  max-height: none !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow-y: visible;
   padding-right: 10px;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
@@ -315,19 +322,20 @@ body {
 
 /* Sabit yükseklikte kartlar için stil */
 .fixed-height-card {
-  height: 225px !important;
-  min-height: 225px !important;
-  max-height: 225px !important;
-  overflow: hidden;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible;
   display: flex;
   flex-direction: column;
 }
 
 /* Kart içeriği için kaydırma - Düzeltilmiş */
 .card-content-scroll {
-  height: calc(100% - 40px); /* Başlık yüksekliğini çıkararak hesapla */
-  overflow-y: auto; /* important kaldırıldı */
-  scrollbar-width: none; /* Firefox için scroll bar'ı gizler */
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: visible !important;
+  scrollbar-width: none;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   padding-right: 5px;
 }
@@ -355,6 +363,9 @@ body {
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .dashboard-card:hover {
@@ -365,27 +376,6 @@ body {
 .dashboard-card .js-plotly-plot {
   border-radius: 6px;
   overflow: hidden;
-}
-
-/* Card content styling */
-.card-content-scroll {
-  max-height: 200px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-.card-content-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.card-content-scroll::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-
-.card-content-scroll::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 4px;
 }
 
 /* KPI number styling */
@@ -419,9 +409,9 @@ body {
 
 /* En Yoğun Trafik Üreten IP'ler için yeni stil - daraltılmış yükseklik */
 .top-talkers-card {
-  height: 250px !important;
-  min-height: 250px !important;
-  max-height: 250px !important;
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
 }
 
 /* Sağ panel için stil (mavi çerçeve içindeki alan) */
@@ -458,8 +448,49 @@ body {
   color: var(--text-green);
 }
 
-/* Analiz özeti için düzeltilmiş stil */
+/* Summary card düzeltmesi */
 .summary-card {
-  overflow-y: auto !important;
-  max-height: 300px !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Analysis summary content düzeltmesi */
+#analysis-summary-content {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Analiz Özeti kartıyla En Yoğun Trafik Üreten IP'ler kartını aynı boyuta getirme */
+.dashboard-card {
+  height: 350px !important; /* Tüm dashboard kartları için sabit yükseklik */
+  min-height: 350px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Özellikle Analiz Özeti kartına özel ayarlar */
+#analysis-summary-content {
+  height: 100% !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Grafik yüksekliği */
+.dashboard-card .js-plotly-plot {
+  height: 270px !important; /* Grafiğin yüksekliğini ayarla */
+}
+
+/* İlk satırdaki kartların özel ayarı */
+/* analysis.py dosyasındaki ilk satır div'e bir ID veya class vermeniz gerekebilir */
+/* Bu seçici yerine daha doğru bir seçici kullanabilirsiniz */
+.dashboard-card:nth-child(1),
+.dashboard-card:nth-child(2) {
+  height: 350px !important;
+  min-height: 350px !important;
 }

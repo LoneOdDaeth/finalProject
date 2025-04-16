@@ -3,5 +3,5 @@
 # Admin Paneli Sekmesi
 ![alt text](admin.png)
 # Analiz Sekmesi
-![alt text](analysis.png)
-![alt text](analysis1.png)
+![alt text](analysis.jpg)
+![alt text](analysis1.jpg)

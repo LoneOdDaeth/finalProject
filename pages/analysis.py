@@ -245,15 +245,84 @@ def update_dashboard(data):
         else:
             time_range_str = "Zaman bilgisi bulunamadı"
             
-        # Prepare summary content
         summary_content = html.Div([
-            html.P(f"👤 Analizi Yapan: {owner_email}", className="mb-2"),
-            html.P(f"📄 Dosya: {filename}", className="mb-2"),
-            html.P(f"🕒 Zaman Aralığı: {time_range_str}", className="mb-2"),
-            html.P(f"📦 Toplam Paket: {result['total_packets']}", className="mb-2"),
-            html.P(f"🔢 Benzersiz Kaynak IP: {len(result['unique_src_ips'])}", className="mb-2"),
-            html.P(f"🔢 Benzersiz Hedef IP: {len(result['unique_dst_ips'])}", className="mb-2"),
-        ])
+            # Üst Kısım - Analiz özeti bilgileri (daha kompakt)
+            html.Div([
+                # User info line
+                html.Div([
+                    html.Span("👤 ", style={"marginRight": "5px"}),
+                    html.Span("Analizi Yapan: ", style={"fontSize": "13px", "opacity": "0.9"}),
+                    html.Span(f"{owner_email}", style={"fontSize": "15px", "fontWeight": "bold"})
+                ], style={"marginBottom": "8px"}),
+                
+                # File info line
+                html.Div([
+                    html.Span("📄 ", style={"marginRight": "5px"}),
+                    html.Span("Dosya: ", style={"fontSize": "13px", "opacity": "0.9"}),
+                    html.Span(f"{filename}", style={"fontSize": "15px", "fontWeight": "bold"})
+                ], style={"marginBottom": "8px"}),
+                
+                # Time range info line
+                html.Div([
+                    html.Span("🕒 ", style={"marginRight": "5px"}),
+                    html.Span("Zaman Aralığı: ", style={"fontSize": "13px", "opacity": "0.9"}),
+                    html.Span(f"{time_range_str}", style={"fontSize": "15px", "fontWeight": "bold"})
+                ])
+            ], style={"marginBottom": "25px", "paddingBottom": "10px", "borderBottom": "1px solid #333"}),
+            
+            # Alt Kısım - Yalın KPI Kutuları
+            html.Div([
+                # Toplam Paket
+                html.Div([
+                    html.Div("Toplam Paket", style={"color": "#CCCCCC", "fontSize": "13px", "fontWeight": "bold"}),
+                    html.Div(f"{result['total_packets']}", style={"color": "#2ecc71", "fontSize": "18px", "fontWeight": "bold"})
+                ], style={
+                    "backgroundColor": "#1a1a1a",
+                    "border": "1px solid #333",
+                    "borderRadius": "5px",
+                    "padding": "10px",
+                    "textAlign": "center",
+                    "width": "32%"
+                }),
+                
+                # Kaynak IP
+                html.Div([
+                    html.Div("Kaynak IP", style={"color": "#CCCCCC", "fontSize": "13px", "fontWeight": "bold"}),
+                    html.Div(f"{len(result['unique_src_ips'])}", style={"color": "#2ecc71", "fontSize": "18px", "fontWeight": "bold"})
+                ], style={
+                    "backgroundColor": "#1a1a1a",
+                    "border": "1px solid #333",
+                    "borderRadius": "5px",
+                    "padding": "10px",
+                    "textAlign": "center",
+                    "width": "32%"
+                }),
+                
+                # Hedef IP
+                html.Div([
+                    html.Div("Hedef IP", style={"color": "#CCCCCC", "fontSize": "13px", "fontWeight": "bold"}),
+                    html.Div(f"{len(result['unique_dst_ips'])}", style={"color": "#2ecc71", "fontSize": "18px", "fontWeight": "bold"})
+                ], style={
+                    "backgroundColor": "#1a1a1a",
+                    "border": "1px solid #333",
+                    "borderRadius": "5px",
+                    "padding": "10px",
+                    "textAlign": "center",
+                    "width": "32%"
+                })
+            ], style={
+                "display": "flex",
+                "justifyContent": "space-between",
+                "width": "100%"
+            })
+        ], style={
+            "padding": "5px",
+            "height": "auto",  # Otomatik yükseklik
+            "overflowY": "visible",  # Kaydırma çubuğunu kaldırma
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "space-between"
+        })
         
         # KPI values
         total_packets = result['total_packets']
