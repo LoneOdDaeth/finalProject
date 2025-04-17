@@ -2,7 +2,7 @@ import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
-from pages import profile, analysis, export, settings, admin
+from pages import profile, analysis, export, settings, admin, network_graph
 from utils.user_context import remove_current_user
 import threading
 import webbrowser
@@ -32,6 +32,7 @@ sidebar = html.Div([
         dbc.Nav([
             dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
             dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
+            dbc.NavLink("🌐 Network Graph", href="/network-graph", active="exact", className="custom-link"),
             dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
         ], vertical=True, pills=True)
     ]),
@@ -107,12 +108,10 @@ def display_page(pathname):
         return analysis.layout
     elif pathname == "/profile":
         return profile.layout
-    elif pathname == "/export":
-        return export.layout
     elif pathname == "/admin":
         return admin.layout
-    elif pathname == "/settings":
-        return settings.layout
+    elif pathname == "/network-graph":
+        return network_graph.layout
     elif pathname == "/logout":
         remove_current_user()
 

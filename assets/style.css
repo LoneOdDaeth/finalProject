@@ -486,3 +486,18 @@
   height: 350px !important;
   min-height: 350px !important;
 }
+
+.network-graph-card {
+  background-color: var(--card-bg-dark);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
+  color: var(--text-main);
+  height: 650px;
+  min-height: 650px;
+  max-height: 650px;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+}
