@@ -1,4 +1,9 @@
 from dash import html, dcc, Input, Output, State, callback, callback_context
+import dash_bootstrap_components as dbc
+from dash import html, dcc, Input, Output, State, callback, ctx
+from dash.exceptions import PreventUpdate
+from utils.user_context import get_current_user
+from database.mongo_operations import get_smtp_settings, save_smtp_settings
 from utils.user_context import get_current_user
 import datetime
 from database.mongo_operations import (
@@ -18,7 +23,7 @@ else:
         
         # Özel İşlem butonu sağ üstte
         html.Div([
-            html.Button("🛠️ Özel İşlem Başlat", 
+            html.Button("🛠️ SMTP Ayarları", 
                     id="custom-admin-btn", 
                     n_clicks=0,
                     className="admin-btn-success",
@@ -104,7 +109,18 @@ else:
                 html.Div(id="mail-log-section", className="admin-scrollable", 
                          style={"maxHeight": "400px"})
             ], style={"padding": "15px"})
-        ], className="admin-card")
+        ], className="admin-card"),
+
+        # Modal - SMTP Ayarları
+        dbc.Modal([
+            dbc.ModalHeader("📧 SMTP Ayarları", close_button=True),
+            dbc.ModalBody(id="admin-smtp-modal-body"),
+            dbc.ModalFooter([
+                html.Button("💾 Ayarları Kaydet", id="admin-save-smtp-btn", className="btn btn-success"),
+                html.Button("İptal", id="admin-cancel-smtp", className="btn btn-secondary")
+            ])
+        ], id="admin-smtp-modal", is_open=False)
+
 
     ], style={
         "backgroundColor": "#1E2124",
@@ -218,3 +234,85 @@ def render_user_list(_):
         )
         for user in users
     ]
+
+@callback(
+    Output("admin-smtp-modal", "is_open"),
+    Input("custom-admin-btn", "n_clicks"),
+    Input("admin-cancel-smtp", "n_clicks"),
+    State("admin-smtp-modal", "is_open"),
+    prevent_initial_call=True
+)
+def toggle_admin_modal(open_click, cancel_click, is_open):
+    return not is_open
+
+@callback(
+    Output("admin-smtp-modal-body", "children"),
+    Input("admin-smtp-modal", "is_open"),
+    prevent_initial_call=True
+)
+def load_admin_smtp_content(opened):
+    if not opened:
+        raise PreventUpdate
+
+    current_user = get_current_user()
+    smtp_data = get_smtp_settings(current_user) or {
+        "host": "", "port": "", "tls": None, "username": "", "password": "", "default_message": ""
+    }
+
+    return html.Div([
+        html.Label("SMTP Host:"),
+        dcc.Input(id="admin-smtp-host", type="text", value=smtp_data["host"], style={"width": "100%"}),
+
+        html.Label("SMTP Port:"),
+        dcc.Input(id="admin-smtp-port", type="number", value=smtp_data["port"], style={"width": "100%"}),
+
+        html.Label("TLS Kullanılsın mı?"),
+        dcc.Dropdown(
+            options=[
+                {"label": "Evet", "value": True},
+                {"label": "Hayır", "value": False}
+            ],
+            value=smtp_data["tls"],
+            id="admin-smtp-tls",
+            style={"width": "100%"}
+        ),
+
+        html.Label("SMTP Kullanıcı Adı:"),
+        dcc.Input(id="admin-smtp-username", type="text", value=smtp_data["username"], style={"width": "100%"}),
+
+        html.Label("SMTP Şifresi:"),
+        dcc.Input(id="admin-smtp-password", type="password", value=smtp_data["password"], style={"width": "100%"}),
+
+        html.Label("✏️ Varsayılan Mail Mesajı:"),
+        dcc.Textarea(id="admin-default-mail-message", value=smtp_data["default_message"],
+                     style={"width": "100%", "height": "100px"}),
+
+        html.Div(id="admin-smtp-feedback", style={"margin-top": "15px", "color": "lime"})
+    ])
+
+@callback(
+    Output("admin-smtp-feedback", "children"),
+    Input("admin-save-smtp-btn", "n_clicks"),
+    State("admin-smtp-host", "value"),
+    State("admin-smtp-port", "value"),
+    State("admin-smtp-tls", "value"),
+    State("admin-smtp-username", "value"),
+    State("admin-smtp-password", "value"),
+    State("admin-default-mail-message", "value"),
+    prevent_initial_call=True
+)
+def save_admin_smtp(_, host, port, tls, username, password, default_message):
+    user = get_current_user()
+    if not all([host, port, tls is not None, username, password]):
+        return "❌ Lütfen tüm alanları doldurun."
+
+    save_smtp_settings(
+        email=user,
+        host=host,
+        port=port,
+        tls=tls,
+        username=username,
+        password=password,
+        default_message=default_message
+    )
+    return "✅ SMTP ayarları başarıyla kaydedildi."

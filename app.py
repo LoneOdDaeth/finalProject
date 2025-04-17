@@ -32,8 +32,6 @@ sidebar = html.Div([
         dbc.Nav([
             dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
             dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
-            dbc.NavLink("📄 PDF & Rapor", href="/export", active="exact", className="custom-link"),
-            dbc.NavLink("⚙️ Ayarlar", href="/settings", active="exact", className="custom-link"),
             dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
         ], vertical=True, pills=True)
     ]),

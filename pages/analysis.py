@@ -10,12 +10,17 @@ from database.mongo_operations import get_user_analyses, get_analysis_by_filenam
 from pathlib import Path
 from pcap_processing.pcap_parser import analyze_pcap
 import dash_bootstrap_components as dbc
+from database.mongo_operations import get_user_pdfs, save_pdf_record, get_analysis_by_filename
+from utils.pdf_generator import generate_pdf_from_figures
 
 # Layout değişikliği (mevcut layout'unuzun yerine aşağıdaki düzeni kullanabilirsiniz)
 layout = html.Div([
     # Header section with file upload and controls
     html.Div([
+
+        # Butonlar aynı hizada - sağda 'Yeni Test' olacak şekilde hizalandı
         html.Div([
+            # Sol taraftaki PCAP butonları
             html.Div([
                 dcc.Upload(
                     id="upload-pcap",
@@ -28,12 +33,27 @@ layout = html.Div([
                            id="start-analysis", 
                            className="admin-btn-success"),
             ], style={"display": "flex", "alignItems": "center"}),
-            html.Div(id="upload-message", style={"margin": "10px 0", "color": "var(--text-green)"}),
-        ], style={"width": "100%", "marginBottom": "20px"}),
-        
+
+            # Sağ taraftaki "Yeni Test" butonu
+            html.Div([
+                html.Button("PDF Oluştur", id="special-analysis-btn", className="admin-btn-success"),
+                html.Div(id="special-pdf-feedback", style={"color": "var(--text-green)", "marginTop": "6px"})
+            ], style={"display": "flex", "flexDirection": "column", "alignItems": "flex-end", "justifyContent": "center"})
+
+        ], style={
+            "display": "flex",
+            "justifyContent": "space-between",
+            "alignItems": "center",
+            "marginBottom": "20px",
+            "paddingRight": "20px"
+        }),
+
+        html.Div(id="upload-message", style={"margin": "10px 0", "color": "var(--text-green)"}),
+
         html.Div([
             html.P("🔽 Görüntülemek istediğiniz analiz dosyasını seçin:", 
                   style={"marginBottom": "10px", "color": "var(--text-main)"}),
+
             dcc.Dropdown(
                 id="analysis-dropdown", 
                 style={
@@ -45,6 +65,7 @@ layout = html.Div([
             ),
         ], style={"width": "50%", "marginBottom": "30px"}),
     ], style={"padding": "20px 0"}),
+
     
     # Yeni yerleşim planı
     # İlk satır - Analiz Özeti ve En Yoğun Trafik Üreten IP'ler
@@ -500,3 +521,82 @@ def handle_upload(content, filename):
 
     except Exception as e:
         return html.Div(f"❌ Hata: {str(e)}", style={"color": "#FF4444"})
+    
+@callback(
+    Output("special-pdf-feedback", "children"),
+    Input("special-analysis-btn", "n_clicks"),
+    State("analysis-dropdown", "value"),
+    prevent_initial_call=True
+)
+def generate_pdf_from_selected_analysis(n_clicks, selected_filename):
+    if not selected_filename:
+        return "❌ Lütfen önce bir analiz dosyası seçin."
+
+    username = get_current_user()
+
+    # 1. Aynı dosya için PDF oluşturulmuş mu?
+    existing_pdfs = get_user_pdfs(username)
+    for pdf in existing_pdfs:
+        if pdf["related_analysis"] == selected_filename:
+            return f"⚠️ '{selected_filename}' dosyası için PDF zaten oluşturulmuş."
+
+    # 2. JSON analiz verisini getir
+    data = get_analysis_by_filename(selected_filename)
+    if not data:
+        return f"❌ '{selected_filename}' adlı analiz bulunamadı."
+
+    result = data["analysis"]
+
+    try:
+        import plotly.express as px
+        import datetime
+        import os
+
+        protocol_data = result["protocols"]
+        pie_fig = px.pie(names=list(protocol_data.keys()), values=list(protocol_data.values()), title="Protokol Dağılımı")
+        bar_fig_protocols = px.bar(x=list(protocol_data.keys()), y=list(protocol_data.values()), title="Protokollere Göre Paket Sayısı")
+        src_fig = px.bar(x=result["unique_src_ips"], y=[1]*len(result["unique_src_ips"]), title="Kaynak IP Dağılımı")
+        dst_fig = px.bar(x=result["unique_dst_ips"], y=[1]*len(result["unique_dst_ips"]), title="Hedef IP Dağılımı")
+        top_talkers = sorted(result["src_ip_counts"].items(), key=lambda x: x[1], reverse=True)[:10]
+        talker_fig = px.bar(x=[ip for ip, _ in top_talkers], y=[count for _, count in top_talkers], title="En Yoğun Trafik Üreten IP'ler")
+
+        time_series_fig = None
+        if result["timestamps"]:
+            time_series_fig = px.line(
+                x=[datetime.datetime.fromtimestamp(ts) for ts in result["timestamps"]],
+                y=list(range(len(result["timestamps"]))),
+                title="Zamana Göre Paket Yoğunluğu"
+            )
+
+        figures = {
+            "protocol_pie": pie_fig,
+            "protocol_bar": bar_fig_protocols,
+            "src_ips": src_fig,
+            "dst_ips": dst_fig,
+            "top_talkers": talker_fig
+        }
+        if time_series_fig:
+            figures["time_series"] = time_series_fig
+
+        pdf_path = generate_pdf_from_figures(
+            figures_dict=figures,
+            meta_info={
+                "Dosya": selected_filename,
+                "Kullanıcı": username,
+                "Tarih": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            },
+            username=username
+        )
+
+        save_pdf_record(
+            username=username,
+            pdf_filename=os.path.basename(pdf_path),
+            timestamp=datetime.datetime.now().isoformat(),
+            related_analysis=selected_filename,
+            path=pdf_path
+        )
+
+        return f"✅ PDF başarıyla oluşturuldu: {os.path.basename(pdf_path)}"
+
+    except Exception as e:
+        return f"❌ PDF oluşturulurken hata oluştu: {str(e)}"
