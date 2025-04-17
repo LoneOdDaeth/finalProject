@@ -48,7 +48,8 @@ sidebar = html.Div([
     "height": "100vh",
     "display": "flex",
     "flexDirection": "column",
-    "justifyContent": "space-between"
+    "justifyContent": "space-between",
+    "border": "none"
 })
 
 # Header bileşeni
@@ -72,7 +73,8 @@ header_bar = html.Div([
     "backgroundColor": "#1c1c1c",
     "padding": "10px 20px",
     "fontSize": "18px",
-    "borderBottom": "2px solid #2ecc71",
+    "borderBottom": "none",
+    "borderLeft": "none",
     "display": "flex",
     "alignItems": "center",
     "justifyContent": "space-between",

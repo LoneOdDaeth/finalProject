@@ -1,359 +1,351 @@
 :root {
-  --bg-black: #1c1c24;
-  --text-green: #2ecc71;
-  --text-gray: #CCCCCC;
-  --text-main: #E0E0E0;
-  --card-bg-dark: #333030;
-  --card-border: #2ecc71;
-  --card-header-green: #23C175;
-  --btn-red: #e74c3c;
-  --btn-green: #2ecc71;
-  --scrollbar-track: #1a1a1a;
-  --scrollbar-thumb: #2ecc71;
-}
-
-body {
-  background-color: #1a1b1f !important;
-  color: var(--text-main);
-  font-family: Arial, sans-serif;
-}
-
-/* Kartlar */
-.profile-card {
-  border: none;
-  box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
-  padding: 20px;
-  background-color: var(--card-bg-dark);
-  margin-bottom: 20px;
-  flex: 1;
-  min-width: 300px;
-  color: var(--text-main);
-}
-
-/* Card iç border problemini çözme */
-.card {
-  border: none !important;
-  background-color: transparent !important;
-  height: 100% !important;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-body {
-  padding: 0 !important;
-  border: none !important;
-  height: 100% !important;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Card içindeki diğer komponentlerdeki borderleri kaldırma */
-.mail-log-row, 
-.mail-log-header {
-  border-color: #444 !important;
-}
-
-/* Analizler ve PDF kartlarında olan borderleri daha az belirgin yapma */
-.card-button-group {
-  border: none !important;
-}
-
-/* İçerideki divler arası çizgileri daha hafif yapma */
-.scrollable-card div[style*="borderBottom"] {
-  border-bottom-color: #444 !important;
-}
-
-/* Kart başlıkları */
-.card-header-green {
-  background-color: transparent !important;
-  border: none;
-  color: white !important;
-  font-weight: bold;
-  padding: 10px 15px;
-  font-size: 16px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-/* Scrollable */
-.scrollable-card {
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-.scrollable-card::-webkit-scrollbar {
-  width: 8px;
-}
-.scrollable-card::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-.scrollable-card::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 4px;
-}
-
-/* Sabit kart yüksekliği */
-.fixed-card-height {
-  max-height: none !important;
-  height: auto !important;
-  min-height: auto !important;
-  overflow-y: visible;
-  padding-right: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-.fixed-card-height::-webkit-scrollbar {
-  width: 8px;
-}
-.fixed-card-height::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-.fixed-card-height::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 4px;
-}
-
-/* Diğer stiller */
-.stat-box {
-  background-color: #1a1818;
-  border: 1px solid var(--text-green);
-  border-radius: 8px;
-  padding: 10px 15px;
-  margin-top: 10px;
-  font-size: 14px;
-  color: var(--text-main);
-}
-
-.mail-log-header {
-  font-size: 15px;
-  font-weight: bold;
-  color: var(--text-gray);
-  margin-bottom: 10px;
-  display: grid;
-  grid-template-columns: 40% 35% 25%;
-}
-.mail-log-row {
-  font-size: 14px;
-  color: var(--text-main);
-  display: grid;
-  grid-template-columns: 40% 35% 25%;
-  padding: 6px 0;
-  border-bottom: 1px solid #333;
-}
-
-/* Sidebar görünümü */
-.sidebar-container {
-  background-color: var(--bg-black);
-  padding: 20px;
-  height: 100%;
-  width: 250px;
-  /* border-right: 2px solid var(--card-border); */
-  border-right: none;
-  border: none;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: fixed;
-}
-
-/* Menü linkleri */
-.custom-link {
-  font-size: 16px;
-  color: var(--text-main);
-  padding: 12px 18px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  display: block;
-  text-decoration: none;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.custom-link:hover {
-  background-color: #2a2a2a;
-  color: var(--text-green);
-}
-
-.custom-link.active {
-  color: var(--text-green) !important;
-  background-color: #333333 !important;
-  font-weight: bold;
-  border-left: 4px solid var(--text-green);
-}
-
-/* Çıkış linki */
-.custom-link.logout-link {
-  color: var(--btn-red);
-}
-
-.custom-link.logout-link.active {
-  color: #FF8888 !important;
-  background-color: #330000 !important;
-}
-
-/* Admin Panel Styling */
-.admin-card {
-  border: none;
-  box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
-  padding: 20px;
-  background-color: var(--card-bg-dark);
-  margin-bottom: 20px;
-  flex: 1;
-  min-width: 300px;
-  color: var(--text-main);
-}
-
-.admin-section {
-  display: flex;
-  gap: 20px;
-  margin-top: 30px;
-  flex-wrap: wrap;
-}
-
-.admin-column {
-  flex: 1;
-  min-width: 300px;
-}
-
-.admin-title {
-  margin-bottom: 15px;
-  color: white;
-  font-weight: bold;
-}
-
-.admin-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  overflow-y: visible;
-}
-
-.admin-list li {
-  padding: 12px 15px;
-  border-bottom: 1px solid #444;
-  color: var(--text-main);
-  font-size: 14px;
-}
-
-.admin-list li:last-child {
-  border-bottom: none;
-}
-
-.admin-form-group {
-  margin-bottom: 15px;
-}
-
-.admin-input {
-  width: 100%;
-  padding: 10px;
-  background-color: #1a1a1a;
-  border: 1px solid var(--text-green);
-  border-radius: 5px;
-  color: var(--text-main);
-}
-
-.admin-btn-success {
-  background-color: var(--btn-green);
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.admin-btn-danger {
-  background-color: var(--btn-red);
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.admin-mail-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-mail-table th,
-.admin-mail-table td {
-  padding: 12px 15px;
-  text-align: left;
-  border-bottom: 1px solid #444;
-}
-
-.admin-mail-table th {
-  color: var(--text-gray);
-  font-weight: bold;
-}
-
-.admin-mail-table td {
-  color: var(--text-main);
-}
-
-/* Scroll style for admin sections */
-.admin-scrollable {
-  max-height: 170px;
-  overflow-y: auto;
-  padding-right: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-}
-
-.admin-scrollable::-webkit-scrollbar {
-  width: 8px;
-}
-
-.admin-scrollable::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
-}
-
-.admin-scrollable::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
-  border-radius: 4px;
-}
-
-/* Sabit yükseklikte kartlar için stil */
-.fixed-height-card {
-  height: auto !important;
-  min-height: auto !important;
-  max-height: none !important;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Kart içeriği için kaydırma - Düzeltilmiş */
-.card-content-scroll {
-  height: auto !important;
-  max-height: none !important;
-  overflow-y: visible !important;
-  scrollbar-width: none;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  padding-right: 5px;
-}
-
-/* İçerik taşarsa scroll bar'ı göster */
-.card-content-scroll:hover {
-  scrollbar-width: auto; /* Hover durumunda Firefox'ta göster */
-}
-
-.card-content-scroll::-webkit-scrollbar {
-  width: 8px;
-  display: none; /* WebKit için scroll bar'ı gizler */
-}
-
-.card-content-scroll:hover::-webkit-scrollbar {
-  display: block; /* Hover durumunda WebKit'te göster */
-}
-
+   --bg-black: #1c1c24;
+   --text-green: #2ecc71;
+   --text-gray: #CCCCCC;
+   --text-main: #E0E0E0;
+   --card-bg-dark: #333030;
+   --card-border: #2ecc71;
+   --card-header-green: #23C175;
+   --btn-red: #e74c3c;
+   --btn-green: #2ecc71;
+   --scrollbar-track: #1a1a1a;
+   --scrollbar-thumb: #2ecc71;
+ }
+ 
+ body {
+   background-color: #1a1b1f !important;
+   color: var(--text-main);
+   font-family: Arial, sans-serif;
+ }
+ 
+ /* Kartlar */
+ .profile-card {
+   border: none;
+   box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
+   padding: 20px;
+   background-color: var(--card-bg-dark);
+   margin-bottom: 20px;
+   flex: 1;
+   min-width: 300px;
+   color: var(--text-main);
+ }
+ 
+ /* Card iç border problemini çözme */
+ .card {
+   border: none !important;
+   background-color: transparent !important;
+ }
+ 
+ .card-body {
+   padding: 0 !important;
+   border: none !important;
+ }
+ 
+ /* Card içindeki diğer komponentlerdeki borderleri kaldırma */
+ .mail-log-row, 
+ .mail-log-header {
+   border-color: #444 !important;
+ }
+ 
+ /* Analizler ve PDF kartlarında olan borderleri daha az belirgin yapma */
+ .card-button-group {
+   border: none !important;
+ }
+ 
+ /* İçerideki divler arası çizgileri daha hafif yapma */
+ .scrollable-card div[style*="borderBottom"] {
+   border-bottom-color: #444 !important;
+ }
+ 
+ /* Kart başlıkları */
+ .card-header-green {
+   background-color: transparent !important;
+   border: none;
+   color: white !important;
+   font-weight: bold;
+   padding: 10px 15px;
+   font-size: 16px;
+   border-top-left-radius: 10px;
+   border-top-right-radius: 10px;
+ }
+ 
+ /* Scrollable */
+ .scrollable-card {
+   max-height: 400px;
+   overflow-y: auto;
+   padding-right: 10px;
+   scrollbar-width: thin;
+   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+ }
+ 
+ .scrollable-card::-webkit-scrollbar {
+   width: 8px;
+ }
+ .scrollable-card::-webkit-scrollbar-track {
+   background: var(--scrollbar-track);
+ }
+ .scrollable-card::-webkit-scrollbar-thumb {
+   background-color: var(--scrollbar-thumb);
+   border-radius: 4px;
+ }
+ 
+ /* Sabit kart yüksekliği */
+ .fixed-card-height {
+   max-height: 280px;
+   height: 280px;
+   overflow-y: auto;
+   padding-right: 10px;
+   scrollbar-width: thin;
+   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+ }
+ 
+ .fixed-card-height::-webkit-scrollbar {
+   width: 8px;
+ }
+ .fixed-card-height::-webkit-scrollbar-track {
+   background: var(--scrollbar-track);
+ }
+ .fixed-card-height::-webkit-scrollbar-thumb {
+   background-color: var(--scrollbar-thumb);
+   border-radius: 4px;
+ }
+ 
+ /* Diğer stiller */
+ .stat-box {
+   background-color: #1a1818;
+   border: 1px solid var(--text-green);
+   border-radius: 8px;
+   padding: 10px 15px;
+   margin-top: 10px;
+   font-size: 14px;
+   color: var(--text-main);
+ }
+ 
+ .mail-log-header {
+   font-size: 15px;
+   font-weight: bold;
+   color: var(--text-gray);
+   margin-bottom: 10px;
+   display: grid;
+   grid-template-columns: 40% 35% 25%;
+ }
+ .mail-log-row {
+   font-size: 14px;
+   color: var(--text-main);
+   display: grid;
+   grid-template-columns: 40% 35% 25%;
+   padding: 6px 0;
+   border-bottom: 1px solid #333;
+ }
+ 
+ /* Sidebar görünümü */
+ .sidebar-container {
+   background-color: var(--bg-black);
+   padding: 20px;
+   height: 100%;
+   width: 250px;
+   /* border-right: 2px solid var(--card-border); */
+   border-right: none;
+   border: none;
+   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.4);
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   position: fixed;
+ }
+ 
+ /* Menü linkleri */
+ .custom-link {
+   font-size: 16px;
+   color: var(--text-main);
+   padding: 12px 18px;
+   border-radius: 8px;
+   margin-bottom: 12px;
+   display: block;
+   text-decoration: none;
+   transition: background-color 0.2s ease, color 0.2s ease;
+ }
+ 
+ .custom-link:hover {
+   background-color: #2a2a2a;
+   color: var(--text-green);
+ }
+ 
+ .custom-link.active {
+   color: var(--text-green) !important;
+   background-color: #333333 !important;
+   font-weight: bold;
+   border-left: 4px solid var(--text-green);
+ }
+ 
+ /* Çıkış linki */
+ .custom-link.logout-link {
+   color: var(--btn-red);
+ }
+ 
+ .custom-link.logout-link.active {
+   color: #FF8888 !important;
+   background-color: #330000 !important;
+ }
+ 
+ /* Admin Panel Styling */
+ .admin-card {
+   border: none;
+   box-shadow: 0 0 12px rgba(46, 204, 113, 0.2);
+   padding: 20px;
+   background-color: var(--card-bg-dark);
+   margin-bottom: 20px;
+   flex: 1;
+   min-width: 300px;
+   color: var(--text-main);
+ }
+ 
+ .admin-section {
+   display: flex;
+   gap: 20px;
+   margin-top: 30px;
+   flex-wrap: wrap;
+ }
+ 
+ .admin-column {
+   flex: 1;
+   min-width: 300px;
+ }
+ 
+ .admin-title {
+   margin-bottom: 15px;
+   color: white;
+   font-weight: bold;
+ }
+ 
+ .admin-list {
+   list-style-type: none;
+   padding: 0;
+   margin: 0;
+   height: 100%;
+   overflow-y: visible;
+ }
+ 
+ .admin-list li {
+   padding: 12px 15px;
+   border-bottom: 1px solid #444;
+   color: var(--text-main);
+   font-size: 14px;
+ }
+ 
+ .admin-list li:last-child {
+   border-bottom: none;
+ }
+ 
+ .admin-form-group {
+   margin-bottom: 15px;
+ }
+ 
+ .admin-input {
+   width: 100%;
+   padding: 10px;
+   background-color: #1a1a1a;
+   border: 1px solid var(--text-green);
+   border-radius: 5px;
+   color: var(--text-main);
+ }
+ 
+ .admin-btn-success {
+   background-color: var(--btn-green);
+   color: white;
+   border: none;
+   padding: 8px 15px;
+   border-radius: 5px;
+   cursor: pointer;
+   font-weight: bold;
+ }
+ 
+ .admin-btn-danger {
+   background-color: var(--btn-red);
+   color: white;
+   border: none;
+   padding: 8px 15px;
+   border-radius: 5px;
+   cursor: pointer;
+   font-weight: bold;
+ }
+ 
+ .admin-mail-table {
+   width: 100%;
+   border-collapse: collapse;
+ }
+ 
+ .admin-mail-table th,
+ .admin-mail-table td {
+   padding: 12px 15px;
+   text-align: left;
+   border-bottom: 1px solid #444;
+ }
+ 
+ .admin-mail-table th {
+   color: var(--text-gray);
+   font-weight: bold;
+ }
+ 
+ .admin-mail-table td {
+   color: var(--text-main);
+ }
+ 
+ /* Scroll style for admin sections */
+ .admin-scrollable {
+   max-height: 170px;
+   overflow-y: auto;
+   padding-right: 10px;
+   scrollbar-width: thin;
+   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+ }
+ 
+ .admin-scrollable::-webkit-scrollbar {
+   width: 8px;
+ }
+ 
+ .admin-scrollable::-webkit-scrollbar-track {
+   background: var(--scrollbar-track);
+ }
+ 
+ .admin-scrollable::-webkit-scrollbar-thumb {
+   background-color: var(--scrollbar-thumb);
+   border-radius: 4px;
+ }
+ 
+ /* Sabit yükseklikte kartlar için stil */
+ .fixed-height-card {
+   height: 225px !important;
+   min-height: 225px !important;
+   max-height: 225px !important;
+   overflow: hidden;
+   display: flex;
+   flex-direction: column;
+ }
+ 
+ /* Kart içeriği için kaydırma - Düzeltilmiş */
+ .card-content-scroll {
+   height: calc(100% - 40px); /* Başlık yüksekliğini çıkararak hesapla */
+   overflow-y: auto; /* important kaldırıldı */
+   scrollbar-width: none; /* Firefox için scroll bar'ı gizler */
+   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+   padding-right: 5px;
+ }
+ 
+ /* İçerik taşarsa scroll bar'ı göster */
+ .card-content-scroll:hover {
+   scrollbar-width: auto; /* Hover durumunda Firefox'ta göster */
+ }
+ 
+ .card-content-scroll::-webkit-scrollbar {
+   width: 8px;
+   display: none; /* WebKit için scroll bar'ı gizler */
+ }
+ 
+ .card-content-scroll:hover::-webkit-scrollbar {
+   display: block; /* Hover durumunda WebKit'te göster */
+ }
+ 
 /* Dashboard card styling */
 .dashboard-card {
   border: none;
