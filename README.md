@@ -5,3 +5,5 @@
 # Analiz Sekmesi
 ![alt text](analysis.jpg)
 ![alt text](analysis1.jpg)
+# Network Graph
+![alt text](network_graph.png)
