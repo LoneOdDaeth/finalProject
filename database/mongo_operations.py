@@ -2,7 +2,9 @@ from crypto.cryptoSaveMaterials import *
 from pymongo import MongoClient
 from datetime import datetime
 import os
-from typing import Optional
+import os
+from datetime import datetime
+import json
 
 client = MongoClient("mongodb://localhost:27017/")
 db = client["Erlik"]
@@ -12,6 +14,44 @@ analyses_collection = db["analyses"]
 pdf_reports_collection = db["pdf_reports"]
 smtp_settings_collection = db["smtp_settings"]
 mail_logs_collection = db["mail_logs"]
+
+def json_dump_to_folder(folder_path):
+    os.makedirs(folder_path, exist_ok=True)
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["Erlik"]
+
+    for collection_name in db.list_collection_names():
+        collection = db[collection_name]
+        data = list(collection.find({}))
+        for d in data:
+            d["_id"] = str(d["_id"])  # ObjectId string'e dönüştürülür
+        file_path = os.path.join(folder_path, f"{collection_name}.json")
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    return True, f"✅ Tüm veriler {folder_path} klasörüne yedeklendi."
+
+
+def json_restore_from_folder(folder_path):
+    client = MongoClient("mongodb://localhost:27017/")
+    db = client["Erlik"]
+
+    for file_name in os.listdir(folder_path):
+        if not file_name.endswith(".json"):
+            continue
+        collection_name = file_name.replace(".json", "")
+        file_path = os.path.join(folder_path, file_name)
+        with open(file_path, encoding="utf-8") as f:
+            data = json.load(f)
+
+        # BURADA _id'leri ellemiyoruz!
+        db[collection_name].drop()
+        if data:
+            db[collection_name].insert_many(data)
+
+    return True, f"✅ Veritabanı {folder_path} klasöründen geri yüklendi."
+
+
 
 # 👤 Kullanıcı Kaydet
 def saveUser(email, password):

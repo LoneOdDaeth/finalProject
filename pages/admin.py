@@ -6,9 +6,13 @@ from utils.user_context import get_current_user
 from database.mongo_operations import get_smtp_settings, save_smtp_settings
 from utils.user_context import get_current_user
 import datetime
+import os
 from database.mongo_operations import (
-    is_admin, get_admin_list, add_admin, get_all_users, remove_admin, get_all_mail_logs
+    is_admin, get_admin_list, add_admin, get_all_users, remove_admin,
+    get_all_mail_logs, json_dump_to_folder, json_restore_from_folder
 )
+from dash.dependencies import Input, Output
+from dash.exceptions import PreventUpdate
 
 current_user = get_current_user()
 
@@ -21,14 +25,40 @@ else:
     layout = html.Div([
         dcc.Location(id="admin-url", refresh=False),
         
-        # Özel İşlem butonu sağ üstte
+        # Özel İşlem + Yedekleme butonları aynı hizada
         html.Div([
+            # Sol: Yedekleme
+            html.Button("💾 Yedek Al", 
+                        id="backup-db-btn", 
+                        className="admin-btn-success",
+                        style={"padding": "8px 20px", "marginRight": "10px"}),
+
+            html.Button("♻️ Yedeği Geri Yükle",
+                        id="restore-db-btn",
+                        className="admin-btn-warning", # Burada düzeltme yaptık
+                        style={"padding": "8px 20px", "marginRight": "auto"}),
+            
+            # Gizli dosya yükleme bileşeni ekliyoruz
+            dcc.Upload(
+                id='upload-db-backup',
+                children=html.Div([]),
+                style={'display': 'none'},
+                multiple=False
+            ),
+
+            html.Div(id="backup-feedback", style={"marginTop": "10px", "color": "#00FF00"}),
+            
+            # Yedek dosyasını indirmek için gizli bir bağlantı
+            html.A(id="download-backup-link", style={"display": "none"}),
+
+            # Sağ: SMTP Ayarları
             html.Button("🛠️ SMTP Ayarları", 
-                    id="custom-admin-btn", 
-                    n_clicks=0,
-                    className="admin-btn-success",
-                    style={"padding": "8px 20px"})
-        ], style={"display": "flex", "justify-content": "flex-end", "margin-bottom": "25px"}),
+                        id="custom-admin-btn", 
+                        n_clicks=0,
+                        className="admin-btn-success",
+                        style={"padding": "8px 20px"})
+        ], style={"display": "flex", "justify-content": "space-between", "margin-bottom": "25px"}),
+
 
         # Admin ve Kullanıcı Yönetimi Satırı
         html.Div([
@@ -316,3 +346,48 @@ def save_admin_smtp(_, host, port, tls, username, password, default_message):
         default_message=default_message
     )
     return "✅ SMTP ayarları başarıyla kaydedildi."
+
+@callback(
+    Output("backup-feedback", "children"),
+    Input("backup-db-btn", "n_clicks"),
+    Input("restore-db-btn", "n_clicks"),
+    prevent_initial_call=True
+)
+def handle_json_db_backup_restore(backup_click, restore_click):
+    import datetime
+    import tkinter as tk
+    from tkinter import filedialog
+
+    triggered = ctx.triggered_id
+
+    if triggered == "backup-db-btn":
+        try:
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            base_folder = r"C:\ErlikYedekler"
+            os.makedirs(base_folder, exist_ok=True)
+            full_path = os.path.join(base_folder, f"erlik_backup_{timestamp}")
+            from database.mongo_operations import json_dump_to_folder
+            success, message = json_dump_to_folder(full_path)
+            return message
+        except Exception as e:
+            return f"❌ Yedekleme sırasında hata oluştu: {str(e)}"
+
+    elif triggered == "restore-db-btn":
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            root.lift()
+            root.attributes("-topmost", True)
+            restore_dir = filedialog.askdirectory(title="Geri yüklenecek klasörü seç")
+            root.destroy()
+
+            if not restore_dir:
+                return "❌ Klasör seçilmedi."
+
+            from database.mongo_operations import json_restore_from_folder
+            success, message = json_restore_from_folder(restore_dir)
+            return message
+        except Exception as e:
+            return f"❌ Geri yükleme sırasında hata oluştu: {str(e)}"
+
+    raise PreventUpdate
