@@ -5,6 +5,7 @@ from database.mongo_operations import *
 from PIL import Image, ImageTk
 from utils.user_context import *
 from packet_sniffer_gui import run_sniffer
+from utils.helpers import show_help_window
 
 # Ortak tasarım özellikleri
 COLORS = {
@@ -156,5 +157,7 @@ title_bar.pack(side="top", fill="x")
 tk.Label(title_bar, text="Giriş Ekranı", bg=COLORS["bg"], fg=COLORS["fg"], font=FONTS["label"]).pack(side="left", padx=10)
 tk.Button(title_bar, text="X", bg=COLORS["button_bg"], fg=COLORS["fg"],
           command=root.destroy, font=FONTS["kendiButon"], width=3).pack(side="right")
+
+root.bind("<F1>", lambda e: show_help_window())
 
 root.mainloop()
