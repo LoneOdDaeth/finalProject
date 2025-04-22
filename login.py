@@ -4,6 +4,7 @@ from tkinter import messagebox
 from database.mongo_operations import *
 from PIL import Image, ImageTk
 from utils.user_context import *
+from packet_sniffer_gui import run_sniffer
 
 # Ortak tasarım özellikleri
 COLORS = {
@@ -108,8 +109,7 @@ def switch_to_new_page():
     right_label.pack()
 
     tk.Button(root, text="Buton 2", bg="gray", fg="black",
-              font=("Arial", 12), command=lambda: print("Buton 2'ye tıklandı!")).place(relx=0.8, rely=0.75, anchor="center")
-
+            font=("Arial", 12), command=run_sniffer).place(relx=0.8, rely=0.75, anchor="center")
 
 # Arayüz
 root = tk.Tk()
