@@ -32,7 +32,7 @@ sidebar = html.Div([
         dbc.Nav([
             dbc.NavLink("👤 Profil", href="/profile", active="exact", className="custom-link"),
             dbc.NavLink("📊 Analiz", href="/analysis", active="exact", className="custom-link"),
-            dbc.NavLink("🌐 Network Graph", href="/network-graph", active="exact", className="custom-link"),
+            dbc.NavLink("🌐 Network Analizi", href="/network-graph", active="exact", className="custom-link"),
             dbc.NavLink("🛠️ Admin Paneli", href="/admin", active="exact", className="custom-link"),
         ], vertical=True, pills=True)
     ]),
@@ -132,12 +132,17 @@ def display_page(pathname):
                 "color": "#FFFFFF"
             })
         ], style={
-            "backgroundColor": "#1E2124",
+            "position": "fixed",
+            "top": "0",
+            "left": "0",
+            "width": "100vw",
             "height": "100vh",
+            "backgroundColor": "#1E2124",
             "display": "flex",
             "flexDirection": "column",
             "justifyContent": "center",
             "alignItems": "center",
+            "zIndex": "9999",
             "font-family": "Arial, sans-serif"
         })
     else:

@@ -150,6 +150,7 @@ def generate_network_graph(selected_file, filter_node):
         mode='markers+text',
         textposition='bottom center',
         hoverinfo='text',
+        textfont=dict(color='white'),
         marker=dict(
             size=15,
             color="#2ecc71",

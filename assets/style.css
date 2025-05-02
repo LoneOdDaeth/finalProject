@@ -501,3 +501,21 @@
   flex-direction: column;
   justify-content: stretch;
 }
+
+/* Dash Dropdown Beyaz Yazı Stili - Tüm durumlardaki görünüm için zorunlu beyaz */
+.Select-control, 
+.Select-value, 
+.Select-placeholder,
+.Select--single > .Select-control .Select-value,
+.VirtualizedSelectOption, 
+.Select-menu-outer, 
+.Select-option {
+  color: white !important;
+  background-color: #1a1a1a !important;
+}
+
+/* Hover olduğunda da beyaz kalsın */
+.Select-option.is-focused {
+  background-color: #2a2a2a !important;
+  color: white !important;
+}
